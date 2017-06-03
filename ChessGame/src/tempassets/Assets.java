@@ -16,12 +16,19 @@ public class Assets {
 	
 	public static BufferedImage[] piece;
 	public static BufferedImage background;
+	public static BufferedImage menuBackground;
+	public static BufferedImage buttonNewGame;
+	public static BufferedImage buttonLoadGame;
+	
 	
 	public static void init()
 	{
 		piece = new BufferedImage[MAX_PIECES];
 		try {
 			background = ImageIO.read(Assets.class.getResource("/background/board.png"));
+			menuBackground = ImageIO.read(Assets.class.getResource("/background/menu_backgorund.png"));
+			buttonNewGame = ImageIO.read(Assets.class.getResource("/button/load_game.png"));
+			buttonLoadGame = ImageIO.read(Assets.class.getResource("/button/new_game.png"));
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

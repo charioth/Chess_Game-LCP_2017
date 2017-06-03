@@ -2,11 +2,13 @@ package input;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
-public class MouseManager implements MouseListener{
+public class MouseManager implements MouseListener, MouseMotionListener{
 	private boolean leftButton;
 	private int x, y;
-	
+	private int moveX, moveY;
+
 	public MouseManager()
 	{
 	}
@@ -26,6 +28,14 @@ public class MouseManager implements MouseListener{
 		return y;
 	}
 	
+	public int getMoveY() {
+		return moveY;
+	}
+
+	public void setMoveY(int moveY) {
+		this.moveY = moveY;
+	}
+
 	@Override
 	public void mousePressed(MouseEvent mouse) 
 	{
@@ -58,6 +68,17 @@ public class MouseManager implements MouseListener{
 	@Override
 	public void mouseExited(MouseEvent mouse)
 	{
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent mouse) {
+		
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent mouse) {
+		moveX = mouse.getX();
+		moveY = mouse.getY();
 	}
 
 }
