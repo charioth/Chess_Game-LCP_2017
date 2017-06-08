@@ -3,26 +3,28 @@ package states;
 import java.awt.Graphics;
 
 import game.Game;
+import graphics.UIList;
 
 public abstract class State {
-	private static State mCurrentState = null;
-	protected Game mGame;
+	private static State currentState = null;
+	protected Game game;
 	
 	State(Game game)
 	{
-		mGame = game;
+		this.game = game;
 	}
 	
 	public static void setCurrentState(State state)
 	{
-		mCurrentState = state;
+		currentState = state;
 	}
 	
 	public static State getCurrentState()
 	{
-		return mCurrentState;
+		return currentState;
 	}
 	
+	public abstract UIList getUIButtons();
 	public abstract void tick();
 	public abstract void render(Graphics graph);
 }

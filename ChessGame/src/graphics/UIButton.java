@@ -15,7 +15,8 @@ public class UIButton {
 	Rectangle bound;
 	State changeToState;
 	
-	public UIButton(int x, int y, int width, int height, BufferedImage button[], State state) {
+	public UIButton(int x, int y, int width, int height, BufferedImage button[], State state) 
+	{
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -26,12 +27,12 @@ public class UIButton {
 		bound = new Rectangle(x, y, width, height);
 	}
 	
-	void tick()
+	public void tick()
 	{
 	
 	}
 	
-	void render(Graphics graph)
+	public void render(Graphics graph)
 	{
 		if(onButton == false)
 		{
@@ -44,8 +45,9 @@ public class UIButton {
 		
 	}
 
-	public void bMouseMoved(int x, int y) {
-		if(bound.contains(x, y))
+	public void bMouseMoved(MouseEvent mouse)
+	{
+		if(bound.contains(mouse.getX(), mouse.getY()))
 		{
 			onButton = true;
 		}
@@ -57,6 +59,9 @@ public class UIButton {
 	
 	public void bMouseRelease() 
 	{
-		State.setCurrentState(changeToState);
+		if(onButton & (changeToState != State.getCurrentState())) 
+		{
+			State.setCurrentState(changeToState);
+		}
 	}
 }

@@ -1,17 +1,21 @@
 package input;
 
 import java.awt.event.MouseEvent;
+
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+
+import states.State;
 
 public class MouseManager implements MouseListener, MouseMotionListener{
 	private boolean leftButton;
 	private int x, y;
 	private int moveX, moveY;
-
+	
 	public MouseManager()
 	{
 	}
+	
 	
 	public boolean isLeftButtonPressed()
 	{
@@ -28,12 +32,14 @@ public class MouseManager implements MouseListener, MouseMotionListener{
 		return y;
 	}
 	
-	public int getMoveY() {
-		return moveY;
+	public int getMovedX() 
+	{
+		return moveX;
 	}
-
-	public void setMoveY(int moveY) {
-		this.moveY = moveY;
+	
+	public int getMovedY() 
+	{
+		return moveY;
 	}
 
 	@Override
@@ -52,6 +58,11 @@ public class MouseManager implements MouseListener, MouseMotionListener{
 	{
 		if(mouse.getButton() == MouseEvent.BUTTON1)
 			leftButton = false;
+		
+		if(State.getCurrentState().getUIButtons() != null)
+		{
+			State.getCurrentState().getUIButtons().bMouseRelease();
+		}
 	}
 	
 	@Override
@@ -71,14 +82,18 @@ public class MouseManager implements MouseListener, MouseMotionListener{
 	}
 
 	@Override
-	public void mouseDragged(MouseEvent mouse) {
+	public void mouseDragged(MouseEvent mouse)
+	{
 		
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent mouse) {
-		moveX = mouse.getX();
-		moveY = mouse.getY();
+	public void mouseMoved(MouseEvent mouse) 
+	{
+		if(State.getCurrentState().getUIButtons() != null)
+		{
+			State.getCurrentState().getUIButtons().bMouseMoved(mouse);
+		}
 	}
 
 }

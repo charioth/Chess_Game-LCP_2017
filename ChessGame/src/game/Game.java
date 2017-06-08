@@ -2,10 +2,10 @@ package game;
 
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
-import java.io.IOException;
 
 import display.Display;
 import input.KeyManager;
+import input.MouseManager;
 import states.GameState;
 import states.MenuState;
 import states.State;
@@ -15,54 +15,60 @@ public class Game implements Runnable{
 	private final float SCREEN_SIZE = 1052;
 	
 	//Game Part
-	private String mName;
-	public int mWidth, mHeight;
-	public float mScale;
+	private String name;
+	public int width, height;
+	public float scale;
 	
 	//Screen Part
-	private Display mDisplay;
-	private BufferStrategy mBs;
-	private Graphics mGraph;
+	private Display display;
+	private BufferStrategy bs;
+	private Graphics graph;
 	
 	//State Part
-	private GameState mGameState;
-	private MenuState mMenuState;
+	private GameState gameState;
+	private MenuState menuState;
 
 	//FPS Lock constant
-	private final int mFps = 60;
-	private final double mTimerPerTick = 1000000000 / (double) mFps;
+	private final int fps = 60;
+	private final double timerPerTick = 1000000000 / (double) fps;
 
 	//Input
-	public KeyManager mKeyboard;
-	
-	private Thread mThread;
-	private boolean mRunning;
+	private KeyManager keyboard;
+	private MouseManager mouse;
+
+	private Thread thread;
+	private boolean running;
 	
 	public Game(String name, float scale)
 	{
 		if(scale <= 0)
 			System.exit(0);
-		mName = name;
-		mWidth = (int) (SCREEN_SIZE*scale);
-		mHeight = (int) (SCREEN_SIZE*scale);
-		mScale = scale;
+		this.name = name;
+		width = (int) (SCREEN_SIZE * scale);
+		height = (int) (SCREEN_SIZE * scale);
+		this.scale = scale;
 	}
 
 	private void init()
 	{
 		//APAGAR ASSETS DEPOIS
 		Assets.init();
-		mDisplay = new Display(mName, mWidth, mHeight);
-		mGameState = new GameState(this);
-		mMenuState = new MenuState(this);
-		mKeyboard = new KeyManager();
-		mDisplay.getFrame().addKeyListener(mKeyboard);
-		State.setCurrentState(mGameState);
+		display = new Display(name, width, height);
+		keyboard = new KeyManager();
+		mouse = new MouseManager();
+		gameState = new GameState(this);
+		menuState = new MenuState(this);
+		display.getFrame().addMouseListener(mouse);
+		display.getFrame().addMouseMotionListener(mouse);
+		display.getCanvas().addMouseListener(mouse);
+		display.getCanvas().addMouseMotionListener(mouse);
+		display.getFrame().addKeyListener(keyboard);
+		State.setCurrentState(menuState);
 	}
 	
 	private void tick()
 	{
-		mKeyboard.tick();
+		keyboard.tick();
 		
 		if(State.getCurrentState() != null)
 		{
@@ -72,21 +78,21 @@ public class Game implements Runnable{
 	
 	private void render()
 	{
-		if(mBs == null)
+		if(bs == null)
 		{
-			mDisplay.getCanvas().createBufferStrategy(3);
+			display.getCanvas().createBufferStrategy(3);
 		}
-		mBs = mDisplay.getCanvas().getBufferStrategy();
-		mGraph = mBs.getDrawGraphics();
-		mGraph.clearRect(0, 0, mWidth, mHeight);
+		bs = display.getCanvas().getBufferStrategy();
+		graph = bs.getDrawGraphics();
+		graph.clearRect(0, 0, width, height);
 
 		if(State.getCurrentState() != null)
 		{
-			State.getCurrentState().render(mGraph);
+			State.getCurrentState().render(graph);
 		}
 		
-		mBs.show();
-		mGraph.dispose();
+		bs.show();
+		graph.dispose();
 	}
 	
 	@Override
@@ -97,10 +103,10 @@ public class Game implements Runnable{
 		
 		init();
 		
-		while(mRunning)
+		while(running)
 		{
 			now = System.nanoTime();
-			delta += (double) (now - lastTime) /  mTimerPerTick;
+			delta += (double) (now - lastTime) /  timerPerTick;
 			lastTime = now;
 			if(delta >= 1)
 			{
@@ -113,25 +119,46 @@ public class Game implements Runnable{
 	
 	public synchronized void start()
 	{
-		if(mRunning == true)
+		if(running == true)
 			return;
-		mRunning = true;
-		mThread = new Thread(this);
-		mThread.start();
+		running = true;
+		thread = new Thread(this);
+		thread.start();
 	}
 	
 	public synchronized void stop()
 	{
-		if(mRunning == false)
+		if(running == false)
 			return;
-		mDisplay.closeDisplay();
-		try {
-			mThread.join();
-		} catch (InterruptedException e) {
+		display.closeDisplay();
+		try 
+		{
+			thread.join();
+		} catch (InterruptedException e)
+		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 	}
 	
+	public GameState getGameState()
+	{
+		return gameState;
+	}
+	
+	public MenuState getMenuState()
+	{
+		return menuState;
+	}
+	
+	public MouseManager getMouse() 
+	{
+		return mouse;
+	}
+	
+	public KeyManager getKeyboard()
+	{
+		return keyboard;
+	}
 }

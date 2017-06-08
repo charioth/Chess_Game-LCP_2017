@@ -3,6 +3,7 @@ package states;
 import java.awt.Graphics;
 
 import game.Game;
+import graphics.UIList;
 import tempassets.Assets;
 
 public class GameState extends State{
@@ -23,9 +24,9 @@ public class GameState extends State{
 	public GameState(Game game) 
 	{
 		super(game);
-		pieceSize = (int)( ((float) Assets.P_SIZE) * mGame.mScale);
-		moveDistance = (int)((float)(Assets.P_SIZE + Assets.BLINE_SIZE) * mGame.mScale);
-		edge = (int)(((float)Assets.EDGE_SIZE) * mGame.mScale);
+		pieceSize = (int)( ((float) Assets.P_SIZE) * game.scale);
+		moveDistance = (int)((float)(Assets.P_SIZE + Assets.BLINE_SIZE) * game.scale);
+		edge = (int)(((float)Assets.EDGE_SIZE) * game.scale);
 	}
 
 	@Override
@@ -43,7 +44,7 @@ public class GameState extends State{
 	public void render(Graphics graph)
 	{
 		int i = 0;
-		graph.drawImage(Assets.background, 0, 0, mGame.mWidth, mGame.mHeight, null);
+		graph.drawImage(Assets.background, 0, 0, game.width, game.height, null);
 		for(i = 0 ; i < 3 ; i++)
 		{
 			//White
@@ -68,5 +69,10 @@ public class GameState extends State{
 			graph.drawImage(Assets.piece[5], move(i), move(1), pieceSize, pieceSize, null);
 			graph.drawImage(Assets.piece[5+Assets.HALF], move(i), move(6), pieceSize, pieceSize, null);
 		}
+	}
+
+	@Override
+	public UIList getUIButtons() {
+		return null;
 	}
 }
