@@ -1,44 +1,58 @@
 package game;
 
+import java.awt.Rectangle;
+
 public class Square {
-	private Point point;
-	private int ID;
+	private Rectangle renderPosition;
+	private int pieceID;
 	private ColorInfo color;
 
-	public Square() {
-
+	public Square() 
+	{
+		renderPosition = null;
+		pieceID = -1;
+		color = null;
 	}
 
-	public Square(Point point) {
-		this.point = point;
+	public Square(Rectangle renderPosition) 
+	{
+		this.renderPosition = renderPosition;
+		pieceID = -1;
 	}
 
-	public Square(Point point, int ID) {
-		this.point = point;
-		this.ID = ID;
+	public Square(Rectangle renderPosition, int ID) 
+	{
+		this.renderPosition = renderPosition;
+		this.pieceID = ID;
 	}
 
-	public Point getPoint() {
-		return point;
+	public Rectangle getRenderPos()
+	{
+		return renderPosition;
+	}
+	
+	public void setRenderPos(Rectangle renderPosition)
+	{
+		this.renderPosition = renderPosition;
+	}
+	
+	public int getPieceID() 
+	{
+		return pieceID;
 	}
 
-	public void setPoint(Point point) {
-		this.point = point;
+	public void setPieceID(int ID)
+	{
+		this.pieceID = ID;
 	}
 
-	public int getID() {
-		return ID;
-	}
-
-	public void setID(int ID) {
-		this.ID = ID;
-	}
-
-	public ColorInfo getColor() {
+	public ColorInfo getColor()
+	{
 		return color;
 	}
 
-	public void setColor(ColorInfo color) {
+	public void setColor(ColorInfo color) 
+	{
 		this.color = color;
 	}
 }

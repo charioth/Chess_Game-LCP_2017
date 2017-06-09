@@ -9,7 +9,7 @@ public enum PieceInfo {
 	HORSE(4),
 	PAWN(5);
 	
-	int value;
+	public int value;
 	
 	PieceInfo(int value)
 	{

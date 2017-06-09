@@ -1,25 +1,22 @@
 package states;
 
 import java.awt.Graphics;
+import java.awt.Rectangle;
 
+import game.ColorInfo;
 import game.Game;
+import game.Square;
 import graphics.UIList;
+import pieces.PieceList;
 import tempassets.Assets;
 
 public class GameState extends State{
-	private final int B_SIZE = 8;
 	private int moveDistance;
 	private int pieceSize;
 	private int edge;
 	
-	/*
-	 * 0 TOWER
-	 * 1 HORSE
-	 * 2 BISHOP
-	 * 3 QUEEN
-	 * 4 KING
-	 * 5 PAWN
-	 * */
+	private Square[][] board = new Square[8][8];
+	private PieceList pieceBox[] = new PieceList[2];
 	
 	public GameState(Game game) 
 	{
@@ -27,12 +24,39 @@ public class GameState extends State{
 		pieceSize = (int)( ((float) Assets.P_SIZE) * game.scale);
 		moveDistance = (int)((float)(Assets.P_SIZE + Assets.BLINE_SIZE) * game.scale);
 		edge = (int)(((float)Assets.EDGE_SIZE) * game.scale);
+		pieceBox[0] = new PieceList(ColorInfo.WHITE);
+		pieceBox[1] = new PieceList(ColorInfo.BLACK);
+		initBoard();
 	}
 
 	@Override
 	public void tick() 
 	{
+	}
+	
+	@Override
+	public void render(Graphics graph)
+	{
+		graph.drawImage(Assets.background, 0, 0, game.width, game.height, null);
 		
+		for(int j = 0 ; j < 2 ; j++)
+		{			
+			for(int i = 0, row, column, value ; i < 16 ; i++)
+			{
+				value = pieceBox[j].getPieces()[i].getType().value;
+				row = pieceBox[j].getPieces()[i].getActualPosition().getRow();
+				column = pieceBox[j].getPieces()[i].getActualPosition().getColumn();
+				if(j == 0)
+					graph.drawImage(Assets.whitePiece[value], board[row][column].getRenderPos().x, board[row][column].getRenderPos().y, pieceSize, pieceSize, null);
+				else
+					graph.drawImage(Assets.blackPiece[value], board[row][column].getRenderPos().x, board[row][column].getRenderPos().y, pieceSize, pieceSize, null);
+			}	
+		}
+	}
+	
+	@Override
+	public UIList getUIButtons() {
+		return null;
 	}
 	
 	private int move(int line)
@@ -40,39 +64,27 @@ public class GameState extends State{
 		return edge + (line * moveDistance);
 	}
 	
-	@Override
-	public void render(Graphics graph)
+	private void initBoard()
 	{
-		int i = 0;
-		graph.drawImage(Assets.background, 0, 0, game.width, game.height, null);
-		for(i = 0 ; i < 3 ; i++)
+		for(int i = 0 ; i < 8 ; i++)
 		{
-			//White
-			graph.drawImage(Assets.piece[i], move(i), move(0) ,pieceSize, pieceSize, null);
-			graph.drawImage(Assets.piece[i], move(B_SIZE-(i+1)), move(0), pieceSize, pieceSize, null);
-			
-			//Black
-			graph.drawImage(Assets.piece[i+Assets.HALF], move(i), move(7) , pieceSize, pieceSize, null);
-			graph.drawImage(Assets.piece[i+Assets.HALF], move(B_SIZE-(i+1)), move(7), pieceSize, pieceSize, null);
+			for(int j = 0 ; j < 8 ; j++)
+			{				
+				board[i][j] = new Square(); 
+				board[i][j].setRenderPos(new Rectangle(move(j), move(i) ,pieceSize, pieceSize));
+			}
 		}
 		
-		//Queen and King
-		for(; i < 5 ; i++)
-		{
-			graph.drawImage(Assets.piece[i], move(i), move(0) , pieceSize, pieceSize, null);
-			graph.drawImage(Assets.piece[i+Assets.HALF], move(i), move(7), pieceSize, pieceSize, null);
+		for(int i = 0 ; i < 2 ; i++)
+		{			
+			ColorInfo color = pieceBox[i].getColor();
+			for(int j = 0, row, column; j < 16 ; j++)
+			{
+				row = pieceBox[i].getPieces()[j].getActualPosition().getRow();
+				column = pieceBox[i].getPieces()[j].getActualPosition().getColumn();
+				board[row][column].setPieceID(j);
+				board[row][column].setColor(color);
+			}
 		}
-		
-		//PAWN
-		for(i = 0 ; i < B_SIZE ; i++)
-		{
-			graph.drawImage(Assets.piece[5], move(i), move(1), pieceSize, pieceSize, null);
-			graph.drawImage(Assets.piece[5+Assets.HALF], move(i), move(6), pieceSize, pieceSize, null);
-		}
-	}
-
-	@Override
-	public UIList getUIButtons() {
-		return null;
 	}
 }

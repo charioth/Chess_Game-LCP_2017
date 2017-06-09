@@ -11,10 +11,10 @@ public class Assets {
 	public static final int P_SIZE = 114;
 	public static final int EDGE_SIZE = 52;
 	public static final int BLINE_SIZE = 5;
-	public static final int MAX_PIECES = 12;
-	public static final int HALF = MAX_PIECES/2;
+	public static final int MAX_PIECES = 6;
 	
-	public static BufferedImage[] piece;
+	public static BufferedImage[] blackPiece;
+	public static BufferedImage[] whitePiece;
 	public static BufferedImage background;
 	public static BufferedImage menuBackground;
 	public static BufferedImage[] buttonNewGame;
@@ -25,7 +25,8 @@ public class Assets {
 	
 	public static void init()
 	{
-		piece = new BufferedImage[MAX_PIECES];
+		whitePiece = new BufferedImage[MAX_PIECES];
+		blackPiece = new BufferedImage[MAX_PIECES];
 		buttonNewGame = new BufferedImage[2];
 		buttonLoadGame = new BufferedImage[2];
 		try {
@@ -37,10 +38,10 @@ public class Assets {
 			buttonNewGame[0] = ImageIO.read(Assets.class.getResource("/button/new_game.png"));
 			buttonLoadGame[1] = ImageIO.read(Assets.class.getResource("/button/load_game_b.png"));
 			buttonNewGame[1] = ImageIO.read(Assets.class.getResource("/button/new_game_b.png"));
-			for(int i = 0 ; i < HALF ; i++)
+			for(int i = 0 ; i < MAX_PIECES ; i++)
 			{
-					piece[i] = ImageIO.read(Assets.class.getResource("/pieces/w_" + i + ".png"));
-					piece[i+HALF] = ImageIO.read(Assets.class.getResource("/pieces/b_" + i + ".png"));
+					whitePiece[i] = ImageIO.read(Assets.class.getResource("/pieces/w_" + i + ".png"));
+					blackPiece[i] = ImageIO.read(Assets.class.getResource("/pieces/b_" + i + ".png"));
 			}
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block

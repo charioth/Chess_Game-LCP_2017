@@ -6,7 +6,6 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
 import states.State;
-import tempassets.Assets;
 
 public class UIButton {
 	private int x, y, width, height;
