@@ -77,7 +77,7 @@ public class GameState extends State{
 		
 		for(int i = 0 ; i < 2 ; i++)
 		{			
-			ColorInfo color = pieceBox[i].getColor();
+			ColorInfo color = pieceBox[i].getPieces()[0].getColor();
 			for(int j = 0, row, column; j < 16 ; j++)
 			{
 				row = pieceBox[i].getPieces()[j].getActualPosition().getRow();

@@ -2,6 +2,7 @@ package pieces;
 
 import java.util.List;
 
+import game.ColorInfo;
 import game.Point;
 import game.Square;
 
@@ -9,15 +10,17 @@ public abstract class Piece {
 	protected Point actualPosition;
 	protected PieceInfo type;
 	protected boolean moved;
-
+	protected ColorInfo color;
+	
 	public Piece() {
 
 	}
 
-	public Piece(Point actualPosition, PieceInfo type, boolean moved) {
+	public Piece(Point actualPosition, PieceInfo type, boolean moved, ColorInfo color) {
 		this.actualPosition = actualPosition;
 		this.type = type;
 		this.moved = moved;
+		this.color = color;
 	}
 
 	public abstract void move(List<Point> validMoves, List<Point> validAtack, final Square board[][]);
@@ -44,5 +47,13 @@ public abstract class Piece {
 
 	public void setMoved(boolean moved) {
 		this.moved = moved;
+	}
+	
+	public ColorInfo getColor() {
+		return this.color;
+	}
+	
+	public void setColor(ColorInfo color) {
+		this.color = color;
 	}
 }

@@ -3,6 +3,7 @@ package pieces;
 import java.util.ArrayList;
 import java.util.List;
 
+import game.ColorInfo;
 import game.Point;
 import game.Square;
 
@@ -11,12 +12,12 @@ public class Rook extends Piece {
 	public Rook() {
 		super();
 		
-		//Posições para a torre
+		//Posiï¿½ï¿½es para a torre
 		List<Point> rookMovements = new ArrayList<>();
 		
 		for(int i = 0; i < 8; i++){
 			/*
-			//Movimentação da torre dependendo da movimentação do enemy
+			//Movimentaï¿½ï¿½o da torre dependendo da movimentaï¿½ï¿½o do enemy
 			if(){
 				
 			}
@@ -26,8 +27,8 @@ public class Rook extends Piece {
 		}
 	}
 
-	public Rook(Point actualPosition, PieceInfo type, boolean moved) {
-		super(actualPosition, type, moved);
+	public Rook(Point actualPosition, PieceInfo type, boolean moved, ColorInfo color) {
+		super(actualPosition, type, moved, color);
 	}
 
 	public void move(List<Point> validMoves, List<Point> validAtack, final Square board[][]) {

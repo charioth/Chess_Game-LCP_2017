@@ -3,6 +3,7 @@ package pieces;
 import java.util.ArrayList;
 import java.util.List;
 
+import game.ColorInfo;
 import game.Point;
 import game.Square;
 
@@ -28,8 +29,8 @@ public class Horse extends Piece {
 		horseMovements.add(new Point(-2,-1));
 	}
 
-	public Horse(Point actualPosition, PieceInfo type, boolean moved) {
-		super(actualPosition, type, moved);
+	public Horse(Point actualPosition, PieceInfo type, boolean moved, ColorInfo color) {
+		super(actualPosition, type, moved, color);
 		
 		horseMovements = new ArrayList<Point>(8);
 		

@@ -3,6 +3,7 @@ package pieces;
 import java.util.ArrayList;
 import java.util.List;
 
+import game.ColorInfo;
 import game.Point;
 import game.Square;
 
@@ -28,8 +29,8 @@ public class King extends Piece {
 		
 	}
 	
-	public King(Point actualPosition, PieceInfo type, boolean moved) {
-		super(actualPosition, type, moved);
+	public King(Point actualPosition, PieceInfo type, boolean moved, ColorInfo color) {
+		super(actualPosition, type, moved, color);
 		
 		kingMovements = new ArrayList<Point>(8);
 		

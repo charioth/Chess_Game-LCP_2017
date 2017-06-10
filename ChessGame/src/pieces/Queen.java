@@ -3,6 +3,7 @@ package pieces;
 import java.util.ArrayList;
 import java.util.List;
 
+import game.ColorInfo;
 import game.Point;
 import game.Square;
 
@@ -14,8 +15,8 @@ public class Queen extends Piece {
 		super();
 	}
 
-	public Queen(Point actualPosition, PieceInfo type, boolean moved) {
-		super(actualPosition, type, moved);
+	public Queen(Point actualPosition, PieceInfo type, boolean moved, ColorInfo color) {
+		super(actualPosition, type, moved, color);
 		
 		queenMovements = new ArrayList<Point>(32);
 		
