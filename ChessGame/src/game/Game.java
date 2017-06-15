@@ -11,37 +11,36 @@ import states.MenuState;
 import states.State;
 import tempassets.Assets;
 
-public class Game implements Runnable{
+public class Game implements Runnable {
 	private final float SCREEN_SIZE = 1052;
-	
-	//Game Part
+
+	// Game Part
 	private String name;
 	public int width, height;
 	public float scale;
-	
-	//Screen Part
+
+	// Screen Part
 	private Display display;
 	private BufferStrategy bs;
 	private Graphics graph;
-	
-	//State Part
+
+	// State Part
 	private GameState gameState;
 	private MenuState menuState;
 
-	//FPS Lock constant
+	// FPS Lock constant
 	private final int fps = 60;
 	private final double timerPerTick = 1000000000 / (double) fps;
 
-	//Input
+	// Input
 	private KeyManager keyboard;
 	private MouseManager mouse;
 
 	private Thread thread;
 	private boolean running;
-	
-	public Game(String name, float scale)
-	{
-		if(scale <= 0)
+
+	public Game(String name, float scale) {
+		if (scale <= 0)
 			System.exit(0);
 		this.name = name;
 		width = (int) (SCREEN_SIZE * scale);
@@ -49,9 +48,8 @@ public class Game implements Runnable{
 		this.scale = scale;
 	}
 
-	private void init()
-	{
-		//APAGAR ASSETS DEPOIS
+	private void init() {
+		// APAGAR ASSETS DEPOIS
 		Assets.init();
 		display = new Display(name, width, height);
 		keyboard = new KeyManager();
@@ -65,100 +63,85 @@ public class Game implements Runnable{
 		display.getFrame().addKeyListener(keyboard);
 		State.setCurrentState(menuState);
 	}
-	
-	private void tick()
-	{
+
+	private void tick() {
 		keyboard.tick();
-		
-		if(State.getCurrentState() != null)
-		{
+
+		if (State.getCurrentState() != null) {
 			State.getCurrentState().tick();
 		}
 	}
-	
-	private void render()
-	{
-		if(bs == null)
-		{
+
+	private void render() {
+		if (bs == null) {
 			display.getCanvas().createBufferStrategy(3);
 		}
 		bs = display.getCanvas().getBufferStrategy();
 		graph = bs.getDrawGraphics();
 		graph.clearRect(0, 0, width, height);
 
-		if(State.getCurrentState() != null)
-		{
+		if (State.getCurrentState() != null) {
 			State.getCurrentState().render(graph);
 		}
-		
+
 		bs.show();
 		graph.dispose();
 	}
-	
+
 	@Override
 	public void run() {
 		double delta = 0.0;
 		long now;
 		long lastTime = System.nanoTime();
-		
+
 		init();
-		
-		while(running)
-		{
+
+		while (running) {
 			now = System.nanoTime();
-			delta += (double) (now - lastTime) /  timerPerTick;
+			delta += (double) (now - lastTime) / timerPerTick;
 			lastTime = now;
-			if(delta >= 1)
-			{
+			if (delta >= 1) {
 				delta--;
 				this.tick();
 				this.render();
 			}
 		}
 	}
-	
-	public synchronized void start()
-	{
-		if(running == true)
+
+	public synchronized void start() {
+		if (running == true)
 			return;
 		running = true;
 		thread = new Thread(this);
 		thread.start();
 	}
-	
-	public synchronized void stop()
-	{
-		if(running == false)
+
+	public synchronized void stop() {
+		if (running == false)
 			return;
 		display.closeDisplay();
-		try 
-		{
+		try {
 			thread.join();
-		} catch (InterruptedException e)
-		{
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	public GameState getGameState()
-	{
+
+	public GameState getGameState() {
 		return gameState;
 	}
-	
-	public MenuState getMenuState()
-	{
+
+	public MenuState getMenuState() {
 		return menuState;
 	}
-	
-	public MouseManager getMouse() 
-	{
+
+	public MouseManager getMouse() {
 		return mouse;
 	}
-	
-	public KeyManager getKeyboard()
-	{
+
+	public KeyManager getKeyboard() {
 		return keyboard;
 	}
 }
