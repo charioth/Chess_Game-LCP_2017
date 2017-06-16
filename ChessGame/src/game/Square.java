@@ -3,37 +3,37 @@ package game;
 import java.awt.Rectangle;
 
 public class Square {
-	private Rectangle renderPosition;
+	private Rectangle renderSquare;
 	private int pieceID;
 	private ColorInfo color;
 
 	public Square() 
 	{
-		renderPosition = null;
+		renderSquare = null;
 		pieceID = -1;
 		color = null;
 	}
 
 	public Square(Rectangle renderPosition) 
 	{
-		this.renderPosition = renderPosition;
+		this.renderSquare = renderPosition;
 		pieceID = -1;
 	}
 
 	public Square(Rectangle renderPosition, int ID) 
 	{
-		this.renderPosition = renderPosition;
+		this.renderSquare = renderPosition;
 		this.pieceID = ID;
 	}
 
-	public Rectangle getRenderPos()
+	public Rectangle renderSquare()
 	{
-		return renderPosition;
+		return renderSquare;
 	}
 	
-	public void setRenderPos(Rectangle renderPosition)
+	public void renderSquare(Rectangle renderPosition)
 	{
-		this.renderPosition = renderPosition;
+		this.renderSquare = renderPosition;
 	}
 	
 	public int getPieceID() 

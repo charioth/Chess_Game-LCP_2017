@@ -6,21 +6,52 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import input.MouseManager;
 import pieces.Piece;
 import pieces.PieceInfo;
 import pieces.PieceList;
+import tempassets.Assets;
 
 public class Movements {
 	public static List<Point> validMoves;
 	public static List<Point> validAttack;
 	public static Map<PieceInfo, List<List<Point>>> possiblePiecesMovements;
-
-	public static void selectPiece(final PieceList pieceBox, final Square board[][], Piece selectedPiece) {
-		selectedPiece.move(validMoves, validAttack, board, possiblePiecesMovements.get(selectedPiece.getType()));
+	public static Piece selectedPiece = null;
+	
+	public static void selectPiece(final MouseManager mouse, final PieceList pieceBox[], final Square board[][], ColorInfo turn) {
+		
+		int row = (mouse.getMouseY() - Assets.getEdge())/ Assets.getMoveDistance();
+		int column = (mouse.getMouseX() - Assets.getEdge())/ Assets.getMoveDistance();
+		if(mouse.isLeftButtonPressed()) {
+			if(row >= 8 || column >= 8)
+				return;
+			
+			if(board[row][column].renderSquare().contains(mouse.getMouseX(),mouse.getMouseY())) {
+				mouse.setLeftButtonPressed(false);
+				int pieceID = board[row][column].getPieceID(); 
+				if((pieceID >= 0) && (board[row][column].getColor() == turn)) {
+					selectedPiece = pieceBox[turn.value].getPieces()[pieceID];
+					selectedPiece.move(validMoves, validAttack, board, 
+							possiblePiecesMovements.get(selectedPiece.getType()));	
+				}
+			}			
+		}
 	}
 
-	public static boolean isValidMove() {
-		return true; // Ta aqui só pra tirar o erro de falta de return
+	public static boolean isValidMove(final MouseManager mouse) {
+		if(mouse.isLeftButtonPressed()) {
+			int row = (mouse.getMouseY() - Assets.getEdge())/ Assets.getMoveDistance();
+			int column = (mouse.getMouseX() - Assets.getEdge())/ Assets.getMoveDistance();
+			for(Point valid : validAttack) {
+				if((valid.getRow() == row) && (valid.getColumn() == column)) {
+					return true;
+				}
+			}
+			selectedPiece = null;
+			validMoves.clear();
+			validAttack.clear();
+		}
+		return false;
 	}
 
 	public static void movePiece(Piece piece, Square board[][], Point selectedMove) {
@@ -37,6 +68,10 @@ public class Movements {
 
 	public static void initializePieceMovements() {
 
+		validMoves = new ArrayList<Point>();
+		validAttack = new ArrayList<Point>();
+		possiblePiecesMovements = new HashMap<PieceInfo, List<List<Point>>>();
+		
 		List<List<Point>> queenMovements = new ArrayList<List<Point>>();
 		List<List<Point>> bishopMovements = new ArrayList<List<Point>>();
 		List<List<Point>> rookMovements = new ArrayList<List<Point>>();

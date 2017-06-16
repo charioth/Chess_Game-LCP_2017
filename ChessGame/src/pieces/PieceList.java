@@ -21,7 +21,6 @@ public class PieceList {
 		if (color == ColorInfo.WHITE) {
 			pos += 7;
 		}
-
 		pieces[0] = new Piece(new Point(pos, 4), PieceInfo.KING, false, color);
 		pieces[1] = new Piece(new Point(pos, 3), PieceInfo.QUEEN, false, color);
 		pieces[2] = new Piece(new Point(pos, 1), PieceInfo.KNIGHT, false, color);
@@ -29,7 +28,7 @@ public class PieceList {
 		pieces[4] = new Piece(new Point(pos, 2), PieceInfo.BISHOP, false, color);
 		pieces[5] = new Piece(new Point(pos, 5), PieceInfo.BISHOP, false, color);
 		pieces[6] = new Piece(new Point(pos, 0), PieceInfo.ROOK, false, color);
-		pieces[7] = new Piece(new Point(pos, 0), PieceInfo.ROOK, false, color);
+		pieces[7] = new Piece(new Point(pos, 7), PieceInfo.ROOK, false, color);
 
 		if (color == ColorInfo.WHITE) {
 			pos = 5;

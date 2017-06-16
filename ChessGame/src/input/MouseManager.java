@@ -9,58 +9,46 @@ import states.State;
 
 public class MouseManager implements MouseListener, MouseMotionListener{
 	private boolean leftButton;
-	private int x, y;
-	private int moveX, moveY;
+	private int x = 0, y = 0;
 	
-	public MouseManager()
-	{
+	public MouseManager() {
 	}
 	
 	
-	public boolean isLeftButtonPressed()
-	{
+	public boolean isLeftButtonPressed() {
 		return leftButton;
 	}
 	
-	public int getMouseX()
-	{
+	public boolean setLeftButtonPressed(boolean leftButton) {
+		return this.leftButton = leftButton;
+	}
+	
+	
+	public int getMouseX() {
 		return x;
 	}
 	
-	public int getMouseY()
-	{
+	public int getMouseY() {
 		return y;
 	}
 	
-	public int getMovedX() 
-	{
-		return moveX;
-	}
-	
-	public int getMovedY() 
-	{
-		return moveY;
-	}
-
 	@Override
-	public void mousePressed(MouseEvent mouse) 
-	{
-		if(mouse.getButton() == MouseEvent.BUTTON1)
-		{
-			leftButton = true;
+	public void mousePressed(MouseEvent mouse)  {
+		if((mouse.getButton() == MouseEvent.BUTTON1)) {
 			x = mouse.getX();
 			y = mouse.getY();
+			leftButton = true;
 		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent mouse) 
 	{
-		if(mouse.getButton() == MouseEvent.BUTTON1)
+		if(mouse.getButton() == MouseEvent.BUTTON1) {
 			leftButton = false;
+		}
 		
-		if(State.getCurrentState().getUIButtons() != null)
-		{
+		if(State.getCurrentState().getUIButtons() != null) {
 			State.getCurrentState().getUIButtons().bMouseRelease();
 		}
 	}

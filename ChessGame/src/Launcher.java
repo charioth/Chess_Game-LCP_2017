@@ -1,5 +1,5 @@
 
-import DAO.connectionSelect;
+//import DAO.connectionSelect;
 import game.Game;
 
 public class Launcher {
@@ -8,8 +8,8 @@ public class Launcher {
 
 		//Inicializando o Acesso ao banco
 		//*********PASSAR ESSA INSTANCIA PARA O MÉTODO RESPONSÁVEL PELO LOAD*******************
-		connectionSelect teste = new connectionSelect();
-		System.out.println("Conexão Aberta!");
+		//connectionSelect teste = new connectionSelect();
+		//System.out.println("Conexão Aberta!");
 
 		
 		Game game  = new Game("ChessGame", 0.8f);

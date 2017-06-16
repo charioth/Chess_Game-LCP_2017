@@ -32,8 +32,7 @@ public class Piece {
 			column = this.actualPosition.getColumn();
 			
 			for (int i = 0; row < 8 && column < 8 && isValid;) {
-				row += dir.get(i).getRow();
-				column += dir.get(i).getColumn();
+				
 				if (board[row][column].getPieceID() == -1) {
 					validMoves.add(new Point(row, column));
 				} else {
@@ -42,6 +41,8 @@ public class Piece {
 					}
 					isValid = false;
 				}
+				row = this.actualPosition.getRow() + dir.get(i).getRow();
+				column = this.actualPosition.getColumn() + dir.get(i).getColumn();
 			}
 		}
 	}

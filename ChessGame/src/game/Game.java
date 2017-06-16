@@ -12,10 +12,10 @@ import states.State;
 import tempassets.Assets;
 
 public class Game implements Runnable {
-	private final float SCREEN_SIZE = 1052;
-
+	
 	// Game Part
 	private String name;
+	private int screen_size = 1052;
 	public int width, height;
 	public float scale;
 
@@ -43,14 +43,14 @@ public class Game implements Runnable {
 		if (scale <= 0)
 			System.exit(0);
 		this.name = name;
-		width = (int) (SCREEN_SIZE * scale);
-		height = (int) (SCREEN_SIZE * scale);
+		width = (int) (screen_size * scale);
+		height = (int) (screen_size * scale);
 		this.scale = scale;
 	}
 
 	private void init() {
 		// APAGAR ASSETS DEPOIS
-		Assets.init();
+		Assets.init(this);
 		display = new Display(name, width, height);
 		keyboard = new KeyManager();
 		mouse = new MouseManager();
