@@ -17,45 +17,95 @@ public class Movements {
 	public static List<Point> validAttack;
 	public static Map<PieceInfo, List<List<Point>>> possiblePiecesMovements;
 	public static Piece selectedPiece = null;
-	
-	public static void selectPiece(final MouseManager mouse, final PieceList pieceBox[], final Square board[][], ColorInfo turn) {
-		
-		int row = (mouse.getMouseY() - Assets.getEdge())/ Assets.getMoveDistance();
-		int column = (mouse.getMouseX() - Assets.getEdge())/ Assets.getMoveDistance();
-		if(mouse.isLeftButtonPressed()) {
-			if(row >= 8 || column >= 8)
+
+	public static void selectPiece(final MouseManager mouse, final PieceList pieceBox[], final Square board[][],
+			ColorInfo turn) {
+
+		int row = (mouse.getMouseY() - Assets.getEdge()) / Assets.getMoveDistance();
+		int column = (mouse.getMouseX() - Assets.getEdge()) / Assets.getMoveDistance();
+		if (mouse.isLeftButtonPressed()) {
+			if (row >= 8 || column >= 8)
 				return;
-			
-			if(board[row][column].renderSquare().contains(mouse.getMouseX(),mouse.getMouseY())) {
+
+			if (board[row][column].renderSquare().contains(mouse.getMouseX(), mouse.getMouseY())) {
 				mouse.setLeftButtonPressed(false);
-				int pieceID = board[row][column].getPieceID(); 
-				if((pieceID >= 0) && (board[row][column].getColor() == turn)) {
+				int pieceID = board[row][column].getPieceID();
+				if ((pieceID >= 0) && (board[row][column].getColor() == turn)) {
 					selectedPiece = pieceBox[turn.value].getPieces()[pieceID];
-					selectedPiece.move(validMoves, validAttack, board, 
-							possiblePiecesMovements.get(selectedPiece.getType()));	
+					selectedPiece.move(validMoves, validAttack, board,
+							possiblePiecesMovements.get(selectedPiece.getType()));
+
+					if (validAttack.isEmpty() && validMoves.isEmpty()) {
+						selectedPiece = null;
+					}
 				}
-			}			
+			}
 		}
 	}
 
 	public static boolean isValidMove(final MouseManager mouse) {
-		if(mouse.isLeftButtonPressed()) {
-			int row = (mouse.getMouseY() - Assets.getEdge())/ Assets.getMoveDistance();
-			int column = (mouse.getMouseX() - Assets.getEdge())/ Assets.getMoveDistance();
-			for(Point valid : validAttack) {
-				if((valid.getRow() == row) && (valid.getColumn() == column)) {
-					return true;
+		boolean isValid = false;
+		if (mouse.isLeftButtonPressed()) {
+			mouse.setLeftButtonPressed(false);
+			int row = (mouse.getMouseY() - Assets.getEdge()) / Assets.getMoveDistance();
+			int column = (mouse.getMouseX() - Assets.getEdge()) / Assets.getMoveDistance();
+
+			for (Point valid : validAttack) {
+				if ((valid.getRow() == row) && (valid.getColumn() == column)) {
+					isValid = true;
 				}
 			}
-			selectedPiece = null;
-			validMoves.clear();
-			validAttack.clear();
+			for (Point valid : validMoves) {
+				if ((valid.getRow() == row) && (valid.getColumn() == column)) {
+					isValid = true;
+				}
+			}
+			if (isValid) {
+				validMoves.clear();
+				validAttack.clear();
+			}
 		}
-		return false;
+		return isValid;
 	}
 
-	public static void movePiece(Piece piece, Square board[][], Point selectedMove) {
+	public static void movePiece(MouseManager mouse, Piece piece, Square board[][], PieceList[] pieceBox,
+			ColorInfo turn) {
+		int adversaryColor = (turn.value == ColorInfo.WHITE.value ? ColorInfo.BLACK.value : ColorInfo.WHITE.value); // Get
+																													// adversary
+																													// turn
+		ColorInfo pieceColor = board[piece.getActualPosition().getRow()][piece.getActualPosition().getColumn()]
+				.getColor();// Get color of selectedPiece
+		int pieceID = board[piece.getActualPosition().getRow()][piece.getActualPosition().getColumn()].getPieceID();// get
+																													// id
+																													// of
+																													// selectedPiece
+		int row = (mouse.getMouseY() - Assets.getEdge()) / Assets.getMoveDistance(); // Map
+																						// mouse
+																						// input
+																						// to
+																						// matrix
+																						// range
+		int column = (mouse.getMouseX() - Assets.getEdge()) / Assets.getMoveDistance(); // Map
+																						// mouse
+																						// input
+																						// to
+																						// matrix
+																						// range
 
+		board[piece.getActualPosition().getRow()][piece.getActualPosition().getColumn()].setPieceID(-1);
+		board[piece.getActualPosition().getRow()][piece.getActualPosition().getColumn()].setColor(null);
+
+		if ((board[row][column].getPieceID() >= 0)) {
+			// Erase a piece from pieceBox
+			pieceBox[adversaryColor].getPieces()[board[row][column].getPieceID()].setColor(null);
+			pieceBox[adversaryColor].getPieces()[board[row][column].getPieceID()].setActualPosition(null);
+			pieceBox[adversaryColor].getPieces()[board[row][column].getPieceID()].setType(null);
+		}
+
+		piece.setActualPosition(new Point(row, column));
+		board[row][column].setPieceID(pieceID);
+		board[row][column].setColor(pieceColor);
+		selectedPiece = null;
 	}
 
 	public static boolean isChecked(final Square board[][]) {
@@ -71,7 +121,7 @@ public class Movements {
 		validMoves = new ArrayList<Point>();
 		validAttack = new ArrayList<Point>();
 		possiblePiecesMovements = new HashMap<PieceInfo, List<List<Point>>>();
-		
+
 		List<List<Point>> queenMovements = new ArrayList<List<Point>>();
 		List<List<Point>> bishopMovements = new ArrayList<List<Point>>();
 		List<List<Point>> rookMovements = new ArrayList<List<Point>>();
