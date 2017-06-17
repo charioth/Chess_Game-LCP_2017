@@ -32,11 +32,15 @@ public class Movements {
 				int pieceID = board[row][column].getPieceID();
 				if ((pieceID >= 0) && (board[row][column].getColor() == turn)) {
 					selectedPiece = pieceBox[turn.value].getPieces()[pieceID];
-					selectedPiece.move(validMoves, validAttack, board, possiblePiecesMovements.get(selectedPiece.getType()));
 
+					selectedPiece.move(validMoves, validAttack, board,
+							possiblePiecesMovements.get(selectedPiece.getType()), selectedPiece.getType());
 					if (validAttack.isEmpty() && validMoves.isEmpty()) {
 						selectedPiece = null;
 					}
+
+					selectedPiece.move(validMoves, validAttack, board,
+							possiblePiecesMovements.get(selectedPiece.getType()), selectedPiece.getType());
 				}
 			}
 		}
@@ -54,11 +58,13 @@ public class Movements {
 					isValid = true;
 				}
 			}
+      
 			for (Point valid : validMoves) {
 				if ((valid.getRow() == row) && (valid.getColumn() == column)) {
 					isValid = true;
 				}
 			}
+      
 			if (isValid) {
 				validMoves.clear();
 				validAttack.clear();
@@ -100,19 +106,43 @@ public class Movements {
 			pieceBox[adversaryColor].getPieces()[board[row][column].getPieceID()].setActualPosition(null);
 			pieceBox[adversaryColor].getPieces()[board[row][column].getPieceID()].setType(null);
 		}
+  }
 
-		piece.setActualPosition(new Point(row, column));
-		board[row][column].setPieceID(pieceID);
-		board[row][column].setColor(pieceColor);
-		selectedPiece = null;
+  	public static void movePawn(List<Point> validMoves, List<Point> validAttack, final Square board[][], Piece pawn) {
+
+		int row = pawn.getActualPosition().getRow(), column = pawn.getActualPosition().getColumn();
+		int offset = pawn.getColor() == ColorInfo.WHITE ? -1 : 1;
+		int boundaries = pawn.getColor() == ColorInfo.WHITE ? -7 : 0;
+
+		if (pawn.isMoved() == false) {
+			if (board[row + (2 * offset)][column].getPieceID() == -1) {
+				validMoves.add(point(row + (2 * offset), column));
+			}
+		}
+
+		if (offset * pawn.getActualPosition().getRow() > boundaries) {
+			if (board[row + offset][column].getPieceID() == -1) {
+				validMoves.add(point(row + offset, column));
+			}
+			if (column > 0) {
+				if (board[row + offset][column - 1].getPieceID() != -1 && board[row + offset][column - 1].getColor() != pawn.getColor()) {
+					validAttack.add(point(row + offset, column - 1));
+				}
+			}
+			if (column < 7) {
+				if (board[row + offset][column + 1].getPieceID() != -1 && board[row + offset][column + 1].getColor() != pawn.getColor()) {
+					validAttack.add(point(row + offset, column + 1));
+				}
+			}
+		}
 	}
-
+  
 	public static boolean isChecked(final Square board[][]) {
-		return true; // Ta aqui só pra tirar o erro de falta de return
+		return true; // Ta aqui sÃ³ pra tirar o erro de falta de return
 	}
 
 	public static boolean isCheckmated(final Square board[][]) {
-		return true; // Ta aqui só pra tirar o erro de falta de return
+		return true; // Ta aqui sÃ³ pra tirar o erro de falta de return
 	}
 
 	public static void initializePieceMovements() {
@@ -146,11 +176,23 @@ public class Movements {
 			bishopMovements.add(queenMovements.get(i + 4));
 		}
 
-		kingMovements.add(Arrays.asList(point(1, 0), point(1, 1), point(0, 1), point(1, -1), point(-1, 0), point(-1, 1),
-				point(0, -1), point(-1, -1)));
+		kingMovements.add(Arrays.asList(point(1, 0)));
+		kingMovements.add(Arrays.asList(point(1, 1)));
+		kingMovements.add(Arrays.asList(point(0, 1)));
+		kingMovements.add(Arrays.asList(point(1, -1)));
+		kingMovements.add(Arrays.asList(point(-1, 0)));
+		kingMovements.add(Arrays.asList(point(-1, 1)));
+		kingMovements.add(Arrays.asList(point(0, -1)));
+		kingMovements.add(Arrays.asList(point(-1, -1)));
 
-		knightMovements.add(Arrays.asList(point(1, 2), point(2, 1), point(-1, 2), point(-2, 1), point(1, -2),
-				point(2, -1), point(-1, -2), point(-2, -1)));
+		knightMovements.add(Arrays.asList(point(1, 2)));
+		knightMovements.add(Arrays.asList(point(2, 1)));
+		knightMovements.add(Arrays.asList(point(-1, 2)));
+		knightMovements.add(Arrays.asList(point(-2, 1)));
+		knightMovements.add(Arrays.asList(point(1, -2)));
+		knightMovements.add(Arrays.asList(point(2, -1)));
+		knightMovements.add(Arrays.asList(point(-1, -2)));
+		knightMovements.add(Arrays.asList(point(-2, -1)));
 
 		possiblePiecesMovements = new HashMap<>();
 		possiblePiecesMovements.put(PieceInfo.KING, kingMovements);
@@ -158,7 +200,14 @@ public class Movements {
 		possiblePiecesMovements.put(PieceInfo.ROOK, rookMovements);
 		possiblePiecesMovements.put(PieceInfo.BISHOP, bishopMovements);
 		possiblePiecesMovements.put(PieceInfo.KNIGHT, knightMovements);
-		possiblePiecesMovements.put(PieceInfo.PAWN, Arrays.asList(Arrays.asList(point(1, 0))));
+		//possiblePiecesMovements.put(PieceInfo.PAWN, Arrays.asList(Arrays.asList(point(1, 0))));
+
+		/*System.out.println("KING: " + kingMovements);
+		System.out.println("KNIGHT: " + knightMovements);
+		System.out.println("Rook: " + rookMovements);
+		System.out.println("Queen: " + queenMovements);
+		System.out.println("Bishop: " + bishopMovements);*/
+
 	}
 
 	private static Point point(int row, int column) {

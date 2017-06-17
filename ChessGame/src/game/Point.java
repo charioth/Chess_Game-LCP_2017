@@ -29,4 +29,9 @@ public class Point {
 	public void setColumn(int column) {
 		this.column = column;
 	}
+	
+	@Override
+	public String toString() {
+		return "Row: " + row + " Column " + column;
+	}
 }
