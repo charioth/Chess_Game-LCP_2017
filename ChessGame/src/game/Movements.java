@@ -32,6 +32,13 @@ public class Movements {
 				int pieceID = board[row][column].getPieceID();
 				if ((pieceID >= 0) && (board[row][column].getColor() == turn)) {
 					selectedPiece = pieceBox[turn.value].getPieces()[pieceID];
+
+					selectedPiece.move(validMoves, validAttack, board,
+							possiblePiecesMovements.get(selectedPiece.getType()), selectedPiece.getType());
+					if (validAttack.isEmpty() && validMoves.isEmpty()) {
+						selectedPiece = null;
+					}
+
 					selectedPiece.move(validMoves, validAttack, board,
 							possiblePiecesMovements.get(selectedPiece.getType()), selectedPiece.getType());
 				}
@@ -40,22 +47,68 @@ public class Movements {
 	}
 
 	public static boolean isValidMove(final MouseManager mouse) {
+		boolean isValid = false;
 		if (mouse.isLeftButtonPressed()) {
+			mouse.setLeftButtonPressed(false);
 			int row = (mouse.getMouseY() - Assets.getEdge()) / Assets.getMoveDistance();
 			int column = (mouse.getMouseX() - Assets.getEdge()) / Assets.getMoveDistance();
+
 			for (Point valid : validAttack) {
 				if ((valid.getRow() == row) && (valid.getColumn() == column)) {
-					return true;
+					isValid = true;
 				}
 			}
-			selectedPiece = null;
-			validMoves.clear();
-			validAttack.clear();
+      
+			for (Point valid : validMoves) {
+				if ((valid.getRow() == row) && (valid.getColumn() == column)) {
+					isValid = true;
+				}
+			}
+      
+			if (isValid) {
+				validMoves.clear();
+				validAttack.clear();
+			}
 		}
-		return false;
+		return isValid;
 	}
 
-	public static void movePawn(List<Point> validMoves, List<Point> validAttack, final Square board[][], Piece pawn) {
+	public static void movePiece(MouseManager mouse, Piece piece, Square board[][], PieceList[] pieceBox,
+			ColorInfo turn) {
+		int adversaryColor = (turn.value == ColorInfo.WHITE.value ? ColorInfo.BLACK.value : ColorInfo.WHITE.value); // Get
+																													// adversary
+																													// turn
+		ColorInfo pieceColor = board[piece.getActualPosition().getRow()][piece.getActualPosition().getColumn()]
+				.getColor();// Get color of selectedPiece
+		int pieceID = board[piece.getActualPosition().getRow()][piece.getActualPosition().getColumn()].getPieceID();// get
+																													// id
+																													// of
+																													// selectedPiece
+		int row = (mouse.getMouseY() - Assets.getEdge()) / Assets.getMoveDistance(); // Map
+																						// mouse
+																						// input
+																						// to
+																						// matrix
+																						// range
+		int column = (mouse.getMouseX() - Assets.getEdge()) / Assets.getMoveDistance(); // Map
+																						// mouse
+																						// input
+																						// to
+																						// matrix
+																						// range
+
+		board[piece.getActualPosition().getRow()][piece.getActualPosition().getColumn()].setPieceID(-1);
+		board[piece.getActualPosition().getRow()][piece.getActualPosition().getColumn()].setColor(null);
+
+		if ((board[row][column].getPieceID() >= 0)) {
+			// Erase a piece from pieceBox
+			pieceBox[adversaryColor].getPieces()[board[row][column].getPieceID()].setColor(null);
+			pieceBox[adversaryColor].getPieces()[board[row][column].getPieceID()].setActualPosition(null);
+			pieceBox[adversaryColor].getPieces()[board[row][column].getPieceID()].setType(null);
+		}
+  }
+
+  	public static void movePawn(List<Point> validMoves, List<Point> validAttack, final Square board[][], Piece pawn) {
 
 		int row = pawn.getActualPosition().getRow(), column = pawn.getActualPosition().getColumn();
 		int offset = pawn.getColor() == ColorInfo.WHITE ? -1 : 1;
@@ -83,17 +136,13 @@ public class Movements {
 			}
 		}
 	}
-	
-	public static void movePiece(Piece piece, Square board[][], Point selectedMove) {
-
-	}
-
+  
 	public static boolean isChecked(final Square board[][]) {
-		return true; // Ta aqui só pra tirar o erro de falta de return
+		return true; // Ta aqui sÃ³ pra tirar o erro de falta de return
 	}
 
 	public static boolean isCheckmated(final Square board[][]) {
-		return true; // Ta aqui só pra tirar o erro de falta de return
+		return true; // Ta aqui sÃ³ pra tirar o erro de falta de return
 	}
 
 	public static void initializePieceMovements() {

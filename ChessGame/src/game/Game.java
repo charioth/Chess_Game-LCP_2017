@@ -12,7 +12,7 @@ import states.State;
 import tempassets.Assets;
 
 public class Game implements Runnable {
-	
+
 	// Game Part
 	private String name;
 	private int screen_size = 1052;
@@ -143,5 +143,9 @@ public class Game implements Runnable {
 
 	public KeyManager getKeyboard() {
 		return keyboard;
+	}
+
+	public void setRunning(boolean exit) {
+		running = exit;
 	}
 }
