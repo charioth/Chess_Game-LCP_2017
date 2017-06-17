@@ -35,12 +35,10 @@ public class Movements {
 
 					selectedPiece.move(validMoves, validAttack, board,
 							possiblePiecesMovements.get(selectedPiece.getType()), selectedPiece.getType());
+					
 					if (validAttack.isEmpty() && validMoves.isEmpty()) {
 						selectedPiece = null;
 					}
-
-					selectedPiece.move(validMoves, validAttack, board,
-							possiblePiecesMovements.get(selectedPiece.getType()), selectedPiece.getType());
 				}
 			}
 		}
@@ -75,28 +73,12 @@ public class Movements {
 
 	public static void movePiece(MouseManager mouse, Piece piece, Square board[][], PieceList[] pieceBox,
 			ColorInfo turn) {
-		int adversaryColor = (turn.value == ColorInfo.WHITE.value ? ColorInfo.BLACK.value : ColorInfo.WHITE.value); // Get
-																													// adversary
-																													// turn
-		ColorInfo pieceColor = board[piece.getActualPosition().getRow()][piece.getActualPosition().getColumn()]
-				.getColor();// Get color of selectedPiece
-		int pieceID = board[piece.getActualPosition().getRow()][piece.getActualPosition().getColumn()].getPieceID();// get
-																													// id
-																													// of
-																													// selectedPiece
-		int row = (mouse.getMouseY() - Assets.getEdge()) / Assets.getMoveDistance(); // Map
-																						// mouse
-																						// input
-																						// to
-																						// matrix
-																						// range
-		int column = (mouse.getMouseX() - Assets.getEdge()) / Assets.getMoveDistance(); // Map
-																						// mouse
-																						// input
-																						// to
-																						// matrix
-																						// range
-
+		int adversaryColor = (turn.value == ColorInfo.WHITE.value ? ColorInfo.BLACK.value : ColorInfo.WHITE.value); 
+		ColorInfo pieceColor = board[piece.getActualPosition().getRow()][piece.getActualPosition().getColumn()].getColor();// Get color of selectedPiece
+		int pieceID = board[piece.getActualPosition().getRow()][piece.getActualPosition().getColumn()].getPieceID();
+		int row = (mouse.getMouseY() - Assets.getEdge()) / Assets.getMoveDistance();
+		int column = (mouse.getMouseX() - Assets.getEdge()) / Assets.getMoveDistance();
+																						
 		board[piece.getActualPosition().getRow()][piece.getActualPosition().getColumn()].setPieceID(-1);
 		board[piece.getActualPosition().getRow()][piece.getActualPosition().getColumn()].setColor(null);
 
@@ -106,6 +88,11 @@ public class Movements {
 			pieceBox[adversaryColor].getPieces()[board[row][column].getPieceID()].setActualPosition(null);
 			pieceBox[adversaryColor].getPieces()[board[row][column].getPieceID()].setType(null);
 		}
+		piece.setMoved(true);
+		piece.setActualPosition(new Point(row, column));
+		board[row][column].setPieceID(pieceID);
+		board[row][column].setColor(pieceColor);
+		selectedPiece = null;
   }
 
   	public static void movePawn(List<Point> validMoves, List<Point> validAttack, final Square board[][], Piece pawn) {
