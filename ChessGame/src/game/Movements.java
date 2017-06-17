@@ -32,8 +32,7 @@ public class Movements {
 				int pieceID = board[row][column].getPieceID();
 				if ((pieceID >= 0) && (board[row][column].getColor() == turn)) {
 					selectedPiece = pieceBox[turn.value].getPieces()[pieceID];
-					selectedPiece.move(validMoves, validAttack, board,
-							possiblePiecesMovements.get(selectedPiece.getType()));
+					selectedPiece.move(validMoves, validAttack, board, possiblePiecesMovements.get(selectedPiece.getType()));
 
 					if (validAttack.isEmpty() && validMoves.isEmpty()) {
 						selectedPiece = null;
