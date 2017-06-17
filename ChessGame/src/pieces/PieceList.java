@@ -16,11 +16,8 @@ public class PieceList {
 	}
 
 	private void initPieces(ColorInfo color) {
-		int pos = 0;
+		int pos = (color == ColorInfo.WHITE? 7 : 0);
 
-		if (color == ColorInfo.WHITE) {
-			pos += 7;
-		}
 		pieces[0] = new Piece(new Point(pos, 4), PieceInfo.KING, false, color);
 		pieces[1] = new Piece(new Point(pos, 3), PieceInfo.QUEEN, false, color);
 		pieces[2] = new Piece(new Point(pos, 1), PieceInfo.KNIGHT, false, color);

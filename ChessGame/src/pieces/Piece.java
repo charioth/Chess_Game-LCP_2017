@@ -3,6 +3,7 @@ package pieces;
 import java.util.List;
 
 import game.ColorInfo;
+import game.Movements;
 import game.Point;
 import game.Square;
 
@@ -23,26 +24,39 @@ public class Piece {
 		this.color = color;
 	}
 
-	public void move(List<Point> validMoves, List<Point> validAttack, final Square board[][], List<List<Point>> possibleMoves) {
+	public void move(List<Point> validMoves, List<Point> validAttack, final Square board[][],
+			List<List<Point>> possibleMoves, PieceInfo type) {
+
+		if (this.type == PieceInfo.PAWN) {
+			Movements.movePawn(validMoves, validAttack, board, this);
+		} else {
+			this.move(validMoves, validAttack, board, possibleMoves);
+		}
+	}
+
+	public void move(List<Point> validMoves, List<Point> validAttack, final Square board[][],
+			List<List<Point>> possibleMoves) {
 		int row, column;
-		boolean isValid;
-		for (List<Point> dir : possibleMoves) {
-			isValid = true;
-			row = this.actualPosition.getRow();
-			column = this.actualPosition.getColumn();
-			
-			for (int i = 0; row < 8 && column < 8 && isValid;) {
-				
+
+		for (List<Point> possibility : possibleMoves) {
+
+			int i = 0;
+			row = this.actualPosition.getRow() + possibility.get(i).getRow();
+			column = this.actualPosition.getColumn() + possibility.get(i).getColumn();
+
+			while (i < possibility.size() && row < 8 && column < 8 && row >= 0 && column >= 0) {
+				//System.out.println("Row: " + row + " | Col: " + column);
 				if (board[row][column].getPieceID() == -1) {
 					validMoves.add(new Point(row, column));
 				} else {
-					if(board[row][column].getColor().value != this.color.value) {
+					if (board[row][column].getColor().value != this.color.value) {
 						validAttack.add(new Point(row, column));
 					}
-					isValid = false;
+					break;
 				}
-				row = this.actualPosition.getRow() + dir.get(i).getRow();
-				column = this.actualPosition.getColumn() + dir.get(i).getColumn();
+				row = this.actualPosition.getRow() + possibility.get(i).getRow();
+				column = this.actualPosition.getColumn() + possibility.get(i).getColumn();
+				i++;
 			}
 		}
 	}

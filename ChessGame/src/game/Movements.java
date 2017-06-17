@@ -17,33 +17,34 @@ public class Movements {
 	public static List<Point> validAttack;
 	public static Map<PieceInfo, List<List<Point>>> possiblePiecesMovements;
 	public static Piece selectedPiece = null;
-	
-	public static void selectPiece(final MouseManager mouse, final PieceList pieceBox[], final Square board[][], ColorInfo turn) {
-		
-		int row = (mouse.getMouseY() - Assets.getEdge())/ Assets.getMoveDistance();
-		int column = (mouse.getMouseX() - Assets.getEdge())/ Assets.getMoveDistance();
-		if(mouse.isLeftButtonPressed()) {
-			if(row >= 8 || column >= 8)
+
+	public static void selectPiece(final MouseManager mouse, final PieceList pieceBox[], final Square board[][],
+			ColorInfo turn) {
+
+		int row = (mouse.getMouseY() - Assets.getEdge()) / Assets.getMoveDistance();
+		int column = (mouse.getMouseX() - Assets.getEdge()) / Assets.getMoveDistance();
+		if (mouse.isLeftButtonPressed()) {
+			if (row >= 8 || column >= 8)
 				return;
-			
-			if(board[row][column].renderSquare().contains(mouse.getMouseX(),mouse.getMouseY())) {
+
+			if (board[row][column].renderSquare().contains(mouse.getMouseX(), mouse.getMouseY())) {
 				mouse.setLeftButtonPressed(false);
-				int pieceID = board[row][column].getPieceID(); 
-				if((pieceID >= 0) && (board[row][column].getColor() == turn)) {
+				int pieceID = board[row][column].getPieceID();
+				if ((pieceID >= 0) && (board[row][column].getColor() == turn)) {
 					selectedPiece = pieceBox[turn.value].getPieces()[pieceID];
-					selectedPiece.move(validMoves, validAttack, board, 
-							possiblePiecesMovements.get(selectedPiece.getType()));	
+					selectedPiece.move(validMoves, validAttack, board,
+							possiblePiecesMovements.get(selectedPiece.getType()), selectedPiece.getType());
 				}
-			}			
+			}
 		}
 	}
 
 	public static boolean isValidMove(final MouseManager mouse) {
-		if(mouse.isLeftButtonPressed()) {
-			int row = (mouse.getMouseY() - Assets.getEdge())/ Assets.getMoveDistance();
-			int column = (mouse.getMouseX() - Assets.getEdge())/ Assets.getMoveDistance();
-			for(Point valid : validAttack) {
-				if((valid.getRow() == row) && (valid.getColumn() == column)) {
+		if (mouse.isLeftButtonPressed()) {
+			int row = (mouse.getMouseY() - Assets.getEdge()) / Assets.getMoveDistance();
+			int column = (mouse.getMouseX() - Assets.getEdge()) / Assets.getMoveDistance();
+			for (Point valid : validAttack) {
+				if ((valid.getRow() == row) && (valid.getColumn() == column)) {
 					return true;
 				}
 			}
@@ -54,6 +55,35 @@ public class Movements {
 		return false;
 	}
 
+	public static void movePawn(List<Point> validMoves, List<Point> validAttack, final Square board[][], Piece pawn) {
+
+		int row = pawn.getActualPosition().getRow(), column = pawn.getActualPosition().getColumn();
+		int offset = pawn.getColor() == ColorInfo.WHITE ? -1 : 1;
+		int boundaries = pawn.getColor() == ColorInfo.WHITE ? -7 : 0;
+
+		if (pawn.isMoved() == false) {
+			if (board[row + (2 * offset)][column].getPieceID() == -1) {
+				validMoves.add(point(row + (2 * offset), column));
+			}
+		}
+
+		if (offset * pawn.getActualPosition().getRow() > boundaries) {
+			if (board[row + offset][column].getPieceID() == -1) {
+				validMoves.add(point(row + offset, column));
+			}
+			if (column > 0) {
+				if (board[row + offset][column - 1].getPieceID() != -1 && board[row + offset][column - 1].getColor() != pawn.getColor()) {
+					validAttack.add(point(row + offset, column - 1));
+				}
+			}
+			if (column < 7) {
+				if (board[row + offset][column + 1].getPieceID() != -1 && board[row + offset][column + 1].getColor() != pawn.getColor()) {
+					validAttack.add(point(row + offset, column + 1));
+				}
+			}
+		}
+	}
+	
 	public static void movePiece(Piece piece, Square board[][], Point selectedMove) {
 
 	}
@@ -71,7 +101,7 @@ public class Movements {
 		validMoves = new ArrayList<Point>();
 		validAttack = new ArrayList<Point>();
 		possiblePiecesMovements = new HashMap<PieceInfo, List<List<Point>>>();
-		
+
 		List<List<Point>> queenMovements = new ArrayList<List<Point>>();
 		List<List<Point>> bishopMovements = new ArrayList<List<Point>>();
 		List<List<Point>> rookMovements = new ArrayList<List<Point>>();
@@ -97,11 +127,23 @@ public class Movements {
 			bishopMovements.add(queenMovements.get(i + 4));
 		}
 
-		kingMovements.add(Arrays.asList(point(1, 0), point(1, 1), point(0, 1), point(1, -1), point(-1, 0), point(-1, 1),
-				point(0, -1), point(-1, -1)));
+		kingMovements.add(Arrays.asList(point(1, 0)));
+		kingMovements.add(Arrays.asList(point(1, 1)));
+		kingMovements.add(Arrays.asList(point(0, 1)));
+		kingMovements.add(Arrays.asList(point(1, -1)));
+		kingMovements.add(Arrays.asList(point(-1, 0)));
+		kingMovements.add(Arrays.asList(point(-1, 1)));
+		kingMovements.add(Arrays.asList(point(0, -1)));
+		kingMovements.add(Arrays.asList(point(-1, -1)));
 
-		knightMovements.add(Arrays.asList(point(1, 2), point(2, 1), point(-1, 2), point(-2, 1), point(1, -2),
-				point(2, -1), point(-1, -2), point(-2, -1)));
+		knightMovements.add(Arrays.asList(point(1, 2)));
+		knightMovements.add(Arrays.asList(point(2, 1)));
+		knightMovements.add(Arrays.asList(point(-1, 2)));
+		knightMovements.add(Arrays.asList(point(-2, 1)));
+		knightMovements.add(Arrays.asList(point(1, -2)));
+		knightMovements.add(Arrays.asList(point(2, -1)));
+		knightMovements.add(Arrays.asList(point(-1, -2)));
+		knightMovements.add(Arrays.asList(point(-2, -1)));
 
 		possiblePiecesMovements = new HashMap<>();
 		possiblePiecesMovements.put(PieceInfo.KING, kingMovements);
@@ -109,7 +151,14 @@ public class Movements {
 		possiblePiecesMovements.put(PieceInfo.ROOK, rookMovements);
 		possiblePiecesMovements.put(PieceInfo.BISHOP, bishopMovements);
 		possiblePiecesMovements.put(PieceInfo.KNIGHT, knightMovements);
-		possiblePiecesMovements.put(PieceInfo.PAWN, Arrays.asList(Arrays.asList(point(1, 0))));
+		//possiblePiecesMovements.put(PieceInfo.PAWN, Arrays.asList(Arrays.asList(point(1, 0))));
+
+		/*System.out.println("KING: " + kingMovements);
+		System.out.println("KNIGHT: " + knightMovements);
+		System.out.println("Rook: " + rookMovements);
+		System.out.println("Queen: " + queenMovements);
+		System.out.println("Bishop: " + bishopMovements);*/
+
 	}
 
 	private static Point point(int row, int column) {

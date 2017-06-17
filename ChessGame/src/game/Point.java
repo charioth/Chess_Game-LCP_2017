@@ -35,4 +35,9 @@ public class Point {
 	{
 		this.column = column;
 	}
+	
+	@Override
+	public String toString() {
+		return "Row: " + row + " Column " + column;
+	}
 }
