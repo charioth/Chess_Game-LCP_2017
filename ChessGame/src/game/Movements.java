@@ -147,7 +147,7 @@ public class Movements {
 		for (int i = 0; i < 8; i++)
 			queenMovements.add(new ArrayList<>());
 
-		for (int i = 1; i < 8; i++) {
+		for (int i = 1; i <= 8; i++) {
 			queenMovements.get(0).add(point(i, 0)); // up
 			queenMovements.get(1).add(point(-i, 0));// down
 			queenMovements.get(2).add(point(0, i)); // right

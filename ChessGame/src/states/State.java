@@ -7,6 +7,8 @@ import graphics.UIList;
 
 public abstract class State {
 	private static State currentState = null;
+	protected static boolean newGame;
+	protected static boolean loadGame;
 	protected Game game;
 
 	State(Game game) {

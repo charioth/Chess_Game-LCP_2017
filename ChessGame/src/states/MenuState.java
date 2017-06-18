@@ -35,6 +35,7 @@ public class MenuState extends State{
 				(int)(buttonHeight), Assets.buttonNewGame,
 				new ButtonAction() {
 					public void action() {
+						State.newGame = true;
 						State.setCurrentState(game.getGameState());
 					}
 				}));

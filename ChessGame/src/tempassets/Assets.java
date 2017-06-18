@@ -38,6 +38,8 @@ public class Assets {
 	public static BufferedImage[] buttonContinue;
 	public static BufferedImage[] buttonYes;
 	public static BufferedImage[] buttonNo;
+	public static BufferedImage[] congratz;
+	public static BufferedImage draw;
 
 	public static void init(Game game) {
 		whitePiece = new BufferedImage[MAX_PIECES];
@@ -50,7 +52,8 @@ public class Assets {
 		buttonContinue = new BufferedImage[2];
 		buttonYes = new BufferedImage[2];
 		buttonNo = new BufferedImage[2];
-
+		congratz =  new BufferedImage[2];
+		
 		try {
 
 			background = ImageIO.read(Assets.class.getResource("/background/board.png"));
@@ -76,6 +79,9 @@ public class Assets {
 			buttonNo[1] = ImageIO.read(Assets.class.getResource("/button/no_b.png"));
 			acceptDraw = ImageIO.read(Assets.class.getResource("/button/draw_request_w.png"));
 			gameLogo = ImageIO.read(Assets.class.getResource("/background/exit_logo.png"));
+			congratz[0] = ImageIO.read(Assets.class.getResource("/button/congratz_w.png"));
+			congratz[1] = ImageIO.read(Assets.class.getResource("/button/congratz_b.png"));
+			draw = ImageIO.read(Assets.class.getResource("/button/draw_game.png"));
 			for (int i = 0; i < MAX_PIECES; i++) {
 				whitePiece[i] = ImageIO.read(Assets.class.getResource("/pieces/w_" + i + ".png"));
 				blackPiece[i] = ImageIO.read(Assets.class.getResource("/pieces/b_" + i + ".png"));

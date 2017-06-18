@@ -2,6 +2,7 @@ package states;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 import game.ColorInfo;
 import game.Game;
@@ -23,6 +24,8 @@ public class GameState extends State {
 	private UIList UIButtonsDraw;
 	private boolean exitMenu;
 	private boolean draw;
+	private boolean exitMsg;
+	private BufferedImage exitLogo;
 
 	public GameState(Game game) {
 		super(game);
@@ -36,7 +39,23 @@ public class GameState extends State {
 
 	@Override
 	public void tick() {
-		if (!exitMenu) {
+
+		if (State.newGame) {
+			State.newGame = false;
+			newGame();
+		} else if (State.loadGame) {
+			State.loadGame = false;
+			loadGame();
+		}
+		
+		if (exitMsg) {
+			if (game.getMouse().isLeftButtonPressed()) {
+				game.getMouse().setLeftButtonPressed(false);
+				game.getKeyboard().mESC = false;
+				exitMsg = false;
+				State.setCurrentState(game.getMenuState());
+			}
+		} else if (!exitMenu) {
 			exitMenu = game.getKeyboard().mESC;
 			if (Movements.selectedPiece == null)
 				Movements.selectPiece(game.getMouse(), pieceBox, board, actualTurn);
@@ -44,7 +63,8 @@ public class GameState extends State {
 				Movements.movePiece(game.getMouse(), Movements.selectedPiece, board, pieceBox, actualTurn);
 				actualTurn = actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE;
 			}
-		}
+		} 
+
 	}
 
 	@Override
@@ -53,11 +73,15 @@ public class GameState extends State {
 		if (Movements.selectedPiece != null) {
 			drawPath(graph);
 		}
-
 		drawTable(graph);
 
-		if (exitMenu == true)
+		if (exitMenu)
 			drawExitMenu(graph);
+
+		if (exitMsg) {
+			graph.drawImage(exitLogo, (int)((game.width/2) - (exitLogo.getWidth()/2 * game.scale)), (int)(game.height/2), (int) (exitLogo.getWidth() * game.scale),
+					(int) (exitLogo.getHeight() * game.scale), null);
+		}
 	}
 
 	private void drawPath(Graphics graph) {
@@ -137,12 +161,19 @@ public class GameState extends State {
 					public void action() {
 						if (exitMenu) {
 							exitMenu = false;
+							
+							exitMsg = true;
+							if (actualTurn == ColorInfo.WHITE)
+								exitLogo = Assets.congratz[ColorInfo.BLACK.value];
+							else
+								exitLogo = Assets.congratz[ColorInfo.WHITE.value];
+							
 							game.getKeyboard().mESC = false;
-							State.setCurrentState(game.getMenuState());
 						}
 					}
 
 				}));
+		
 		buttonWidth = Assets.buttonSave[0].getWidth() * game.scale;
 		buttonHeight = Assets.buttonSave[0].getHeight() * game.scale;
 
@@ -159,6 +190,7 @@ public class GameState extends State {
 							}
 
 						}));
+		
 		buttonWidth = Assets.buttonDraw[0].getWidth() * game.scale;
 		buttonHeight = Assets.buttonDraw[0].getHeight() * game.scale;
 
@@ -196,11 +228,11 @@ public class GameState extends State {
 						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonYes, new ButtonAction() {
 							public void action() {
 								if (exitMenu) {
-									// Adicionar msg de empate
-									draw = false;
+									exitMsg = true;
 									exitMenu = false;
+									exitLogo = Assets.draw;
+									draw = false;
 									game.getKeyboard().mESC = false;
-									State.setCurrentState(game.getMenuState());
 								}
 							}
 
@@ -221,6 +253,17 @@ public class GameState extends State {
 							}
 
 						}));
+	}
+
+	private void newGame() {
+		actualTurn = ColorInfo.WHITE;
+		pieceBox[0] = new PieceList(ColorInfo.WHITE);
+		pieceBox[1] = new PieceList(ColorInfo.BLACK);
+		initBoard();
+	}
+
+	private void loadGame() {
+
 	}
 
 	private void initBoard() {

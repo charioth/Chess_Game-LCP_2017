@@ -46,6 +46,7 @@ public class UIButton {
 
 	public void bMouseRelease() {
 		if (onButton) {
+			onButton = false;
 			click.action();
 		}
 	}
