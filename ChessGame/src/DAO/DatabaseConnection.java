@@ -4,9 +4,14 @@ package DAO;
 import java.sql.*;
 
 
-public class connectionFactory {
+public class DatabaseConnection {
 	//Método para pegar a conexão com o banco
-	public Connection getConnection() {
+	
+	public DatabaseConnection() {
+		
+	}
+	
+	public Connection newConnection() {
 		try {
 	        return DriverManager.getConnection("Caminho", "user", "password");
 	    } catch (Exception e) {

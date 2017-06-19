@@ -3,12 +3,12 @@ package pieces;
 import java.util.List;
 
 import game.ColorInfo;
-import game.Movements;
-import game.Point;
+import game.BoardMoviments;
+import game.Coordinates;
 import game.Square;
 
 public class Piece {
-	protected Point actualPosition;
+	protected Coordinates actualPosition;
 	protected PieceInfo type;
 	protected boolean moved;
 	protected ColorInfo color;
@@ -17,28 +17,61 @@ public class Piece {
 
 	}
 
-	public Piece(Point actualPosition, PieceInfo type, boolean moved, ColorInfo color) {
+	public Piece(Coordinates actualPosition, PieceInfo type, boolean moved, ColorInfo color) {
 		this.actualPosition = actualPosition;
 		this.type = type;
 		this.moved = moved;
 		this.color = color;
 	}
 
-	public void move(List<Point> validMoves, List<Point> validAttack, final Square board[][],
-			List<List<Point>> possibleMoves, PieceInfo type) {
-
+	public void move(List<Coordinates> validMoves, List<Coordinates> validAttack, final Square board[][],
+			List<List<Coordinates>> possibleMoves) {
+		/* Choose a movement method based on piece type */
 		if (this.type == PieceInfo.PAWN) {
-			Movements.movePawn(validMoves, validAttack, board, this);
+			this.pawnMovements(validMoves, validAttack, board);
 		} else {
-			this.move(validMoves, validAttack, board, possibleMoves);
+			this.pieceMovements(validMoves, validAttack, board, possibleMoves);
 		}
 	}
 
-	public void move(List<Point> validMoves, List<Point> validAttack, final Square board[][],
-			List<List<Point>> possibleMoves) {
+	public void pawnMovements(List<Coordinates> validMoves, List<Coordinates> validAttack, final Square board[][]) {
+
+		int row = this.getActualPosition().getRow(), column = this.getActualPosition().getColumn();
+		int offset = this.getColor() == ColorInfo.WHITE ? -1 : 1;
+		int boundaries = this.getColor() == ColorInfo.WHITE ? -7 : 0;
+
+		if (this.isMoved() == false) {
+			if (board[row + (2 * offset)][column].getPieceID() == -1) {
+				validMoves.add(point(row + (2 * offset), column));
+			}
+		}
+
+		if (offset * this.getActualPosition().getRow() > boundaries) {
+			if (board[row + offset][column].getPieceID() == -1) {
+				validMoves.add(point(row + offset, column));
+			}
+			if (column > 0) {
+				if (board[row + offset][column - 1].getPieceID() != -1 && board[row + offset][column - 1].getColor() != this.getColor()) {
+					validAttack.add(point(row + offset, column - 1));
+				}
+			}
+			if (column < 7) {
+				if (board[row + offset][column + 1].getPieceID() != -1 && board[row + offset][column + 1].getColor() != this.getColor()) {
+					validAttack.add(point(row + offset, column + 1));
+				}
+			}
+		}
+	}
+	
+	private static Coordinates point(int row, int column) {
+		return new Coordinates(row, column);
+	}
+	
+	public void pieceMovements(List<Coordinates> validMoves, List<Coordinates> validAttack, final Square board[][],
+			List<List<Coordinates>> possibleMoves) {
 		int row, column;
 
-		for (List<Point> possibility : possibleMoves) {
+		for (List<Coordinates> possibility : possibleMoves) {
 
 			int i = 0;
 			row = this.actualPosition.getRow() + possibility.get(i).getRow();
@@ -47,10 +80,10 @@ public class Piece {
 			while (i < possibility.size() && row < 8 && column < 8 && row >= 0 && column >= 0) {
 				//System.out.println("Row: " + row + " | Col: " + column);
 				if (board[row][column].getPieceID() == -1) {
-					validMoves.add(new Point(row, column));
+					validMoves.add(new Coordinates(row, column));
 				} else {
 					if (board[row][column].getColor().value != this.color.value) {
-						validAttack.add(new Point(row, column));
+						validAttack.add(new Coordinates(row, column));
 					}
 					break;
 				}
@@ -61,11 +94,11 @@ public class Piece {
 		}
 	}
 
-	public Point getActualPosition() {
+	public Coordinates getActualPosition() {
 		return actualPosition;
 	}
 
-	public void setActualPosition(Point actualPosition) {
+	public void setActualPosition(Coordinates actualPosition) {
 		this.actualPosition = actualPosition;
 	}
 

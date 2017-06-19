@@ -3,9 +3,10 @@ package game;
 import java.awt.Rectangle;
 
 public class Square {
-	private Rectangle renderSquare;
-	private int pieceID;
-	private ColorInfo color;
+	/* Represents each square of the board */
+	private Rectangle renderSquare; // Position to be rendered in the screen
+	private int pieceID; // -1 if there is no piece in the square
+	private ColorInfo color; // null if there is no piece in the square
 
 	public Square() {
 		renderSquare = null;

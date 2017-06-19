@@ -6,8 +6,8 @@ import java.awt.image.BufferedImage;
 
 import game.ColorInfo;
 import game.Game;
-import game.Movements;
-import game.Point;
+import game.BoardMoviments;
+import game.Coordinates;
 import game.Square;
 import graphics.ButtonAction;
 import graphics.UIButton;
@@ -32,7 +32,7 @@ public class GameState extends State {
 		pieceBox[0] = new PieceList(ColorInfo.WHITE);
 		pieceBox[1] = new PieceList(ColorInfo.BLACK);
 		actualTurn = ColorInfo.WHITE;
-		Movements.initializePieceMovements(); // Pieces movement rules
+		BoardMoviments.initializePieceMovements(); // Pieces movement rules
 		initBoard();
 		initUIButton();
 	}
@@ -57,10 +57,10 @@ public class GameState extends State {
 			}
 		} else if (!exitMenu) {
 			exitMenu = game.getKeyboard().mESC;
-			if (Movements.selectedPiece == null)
-				Movements.selectPiece(game.getMouse(), pieceBox, board, actualTurn);
-			else if (Movements.isValidMove(game.getMouse())) {
-				Movements.movePiece(game.getMouse(), Movements.selectedPiece, board, pieceBox, actualTurn);
+			if (BoardMoviments.selectedPiece == null)
+				BoardMoviments.selectPiece(game.getMouse(), pieceBox, board, actualTurn);
+			else if (BoardMoviments.isValidMove(game.getMouse())) {
+				BoardMoviments.movePiece(game.getMouse(), BoardMoviments.selectedPiece, board, pieceBox, actualTurn);
 				actualTurn = actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE;
 			}
 		} 
@@ -70,7 +70,7 @@ public class GameState extends State {
 	@Override
 	public void render(Graphics graph) {
 		graph.drawImage(Assets.background, 0, 0, game.width, game.height, null);
-		if (Movements.selectedPiece != null) {
+		if (BoardMoviments.selectedPiece != null) {
 			drawPath(graph);
 		}
 		drawTable(graph);
@@ -85,17 +85,17 @@ public class GameState extends State {
 	}
 
 	private void drawPath(Graphics graph) {
-		int row = Movements.selectedPiece.getActualPosition().getRow();
-		int column = Movements.selectedPiece.getActualPosition().getColumn();
+		int row = BoardMoviments.selectedPiece.getActualPosition().getRow();
+		int column = BoardMoviments.selectedPiece.getActualPosition().getColumn();
 		graph.drawImage(Assets.select_square, board[row][column].renderSquare().x, board[row][column].renderSquare().y,
 				Assets.getSquareSize(), Assets.getSquareSize(), null);
 
-		for (Point valid : Movements.validMoves) {
+		for (Coordinates valid : BoardMoviments.validMoves) {
 			graph.drawImage(Assets.move_square, board[valid.getRow()][valid.getColumn()].renderSquare().x,
 					board[valid.getRow()][valid.getColumn()].renderSquare().y, Assets.getSquareSize(),
 					Assets.getSquareSize(), null);
 		}
-		for (Point valid : Movements.validAttack) {
+		for (Coordinates valid : BoardMoviments.validAttack) {
 			graph.drawImage(Assets.attack_square, board[valid.getRow()][valid.getColumn()].renderSquare().x,
 					board[valid.getRow()][valid.getColumn()].renderSquare().y, Assets.getSquareSize(),
 					Assets.getSquareSize(), null);
@@ -107,7 +107,7 @@ public class GameState extends State {
 			for (int i = 0; i < 16; i++) {
 				PieceInfo type = pieceBox[j].getPieces()[i].getType();
 				ColorInfo color = pieceBox[j].getPieces()[i].getColor();
-				Point piecePoint = pieceBox[j].getPieces()[i].getActualPosition();
+				Coordinates piecePoint = pieceBox[j].getPieces()[i].getActualPosition();
 
 				if (color == null)
 					continue;
