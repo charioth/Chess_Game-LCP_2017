@@ -8,6 +8,8 @@ import java.awt.event.MouseMotionListener;
 import states.State;
 
 public class MouseManager implements MouseListener, MouseMotionListener {
+	/* Mouse manager class it implement the actions on the click of the left mouse
+	 * and keep track of the actual position of the mouse on the screen*/
 	private boolean leftButton;
 	private int x = 0, y = 0;
 
@@ -19,6 +21,8 @@ public class MouseManager implements MouseListener, MouseMotionListener {
 	}
 
 	public boolean setLeftButtonPressed(boolean leftButton) {
+		/* In case that the person keeps holding the left mouse button this method can be called 
+		 * out and stop manually the constant input of the holding*/
 		return this.leftButton = leftButton;
 	}
 
@@ -32,7 +36,10 @@ public class MouseManager implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mousePressed(MouseEvent mouse) {
+		/*Method called every time the mouse is pressed*/
+		//Check if the BUTTON1 was pressed button1 represent the left mouse button
 		if ((mouse.getButton() == MouseEvent.BUTTON1)) {
+			//if it was pressed get the mouse position
 			x = mouse.getX();
 			y = mouse.getY();
 			leftButton = true;
@@ -41,10 +48,13 @@ public class MouseManager implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mouseReleased(MouseEvent mouse) {
+		/*Method called when the mouse button is released*/
+		//Check if the mouse released was the left mouse button
 		if (mouse.getButton() == MouseEvent.BUTTON1) {
 			leftButton = false;
 		}
 
+		//If there is a button list on the current state, call it and execute the MouseRelease of each button
 		if (State.getCurrentState().getUIButtons() != null) {
 			State.getCurrentState().getUIButtons().bMouseRelease();
 		}
@@ -70,6 +80,8 @@ public class MouseManager implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mouseMoved(MouseEvent mouse) {
+		/*Every mouse movement this method is called and it checks if the current
+		 * state has a button list, if it is true then call the mouseMoved method of each button on the list*/
 		if (State.getCurrentState().getUIButtons() != null) {
 			State.getCurrentState().getUIButtons().bMouseMoved(mouse);
 		}

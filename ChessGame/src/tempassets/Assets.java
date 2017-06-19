@@ -9,7 +9,8 @@ import game.Game;
 
 public class Assets {
 	/* Piece Width/Height */
-
+	/*Contains the the all images used in the program and their info*/
+	
 	private static final int MAX_PIECES = 6;
 	private static final int EDGE_SIZE = 52;
 	public static final int BLUE_LINE_SIZE = 5;
@@ -55,7 +56,7 @@ public class Assets {
 		congratz =  new BufferedImage[2];
 		
 		try {
-
+			/*Import all images used on the program*/
 			background = ImageIO.read(Assets.class.getResource("/background/board.png"));
 			menuBackground = ImageIO.read(Assets.class.getResource("/background/menu_backgroud.png"));
 			move_square = ImageIO.read(Assets.class.getResource("/background/blue_square.png"));
@@ -87,6 +88,7 @@ public class Assets {
 				blackPiece[i] = ImageIO.read(Assets.class.getResource("/pieces/b_" + i + ".png"));
 			}
 
+			//calculate the piece size changing it scale based on the game scale variable
 			pieceSize = (int) (((float) PIECE_SIZE) * game.scale);
 			moveDistance = (int) ((float) (PIECE_SIZE + Assets.BLUE_LINE_SIZE) * game.scale);
 			edge = (int) (((float) Assets.EDGE_SIZE) * game.scale);
