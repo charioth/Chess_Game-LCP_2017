@@ -24,11 +24,11 @@ public class Square {
 		this.pieceID = ID;
 	}
 
-	public Rectangle renderSquare() {
+	public Rectangle getRenderSquare() {
 		return renderSquare;
 	}
 
-	public void renderSquare(Rectangle renderPosition) {
+	public void setRenderSquare(Rectangle renderPosition) {
 		this.renderSquare = renderPosition;
 	}
 

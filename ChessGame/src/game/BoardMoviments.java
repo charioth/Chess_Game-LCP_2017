@@ -28,7 +28,7 @@ public class BoardMoviments {
 			if (row >= 8 || column >= 8) // See if mouse is out of bounds
 				return;
 
-			if (board[row][column].renderSquare().contains(mouse.getMouseX(), mouse.getMouseY())) {
+			if (board[row][column].getRenderSquare().contains(mouse.getMouseX(), mouse.getMouseY())) {
 				mouse.setLeftButtonPressed(false);
 				int pieceID = board[row][column].getPieceID();
 
@@ -122,7 +122,7 @@ public class BoardMoviments {
 	}
 
 	public static void initializePieceMovements() {
-		/* Determines the rules of piece movements */
+		/* Determines the rules of piece movements, each list of a piece is a direction */
 		validMoves = new ArrayList<Coordinates>();
 		validAttack = new ArrayList<Coordinates>();
 		possiblePiecesMovements = new HashMap<PieceInfo, List<List<Coordinates>>>();
@@ -136,7 +136,7 @@ public class BoardMoviments {
 		for (int i = 0; i < 8; i++)
 			queenMovements.add(new ArrayList<>());
 		
-		// All possible queen movements, each list is a direction
+		// All possible queen movements
 		for (int i = 1; i <= 8; i++) {
 			queenMovements.get(0).add(point(i, 0)); // up
 			queenMovements.get(1).add(point(-i, 0));// down
@@ -154,6 +154,7 @@ public class BoardMoviments {
 			bishopMovements.add(queenMovements.get(i + 4));
 		}
 		
+		// King movements
 		kingMovements.add(Arrays.asList(point(1, 0)));
 		kingMovements.add(Arrays.asList(point(1, 1)));
 		kingMovements.add(Arrays.asList(point(0, 1)));
@@ -162,7 +163,8 @@ public class BoardMoviments {
 		kingMovements.add(Arrays.asList(point(-1, 1)));
 		kingMovements.add(Arrays.asList(point(0, -1)));
 		kingMovements.add(Arrays.asList(point(-1, -1)));
-
+		
+		// Knight movements
 		knightMovements.add(Arrays.asList(point(1, 2)));
 		knightMovements.add(Arrays.asList(point(2, 1)));
 		knightMovements.add(Arrays.asList(point(-1, 2)));

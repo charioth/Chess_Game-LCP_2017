@@ -37,27 +37,35 @@ public class Piece {
 	public void pawnMovements(List<Coordinates> validMoves, List<Coordinates> validAttack, final Square board[][]) {
 
 		int row = this.getActualPosition().getRow(), column = this.getActualPosition().getColumn();
-		int offset = this.getColor() == ColorInfo.WHITE ? -1 : 1;
+		int side = this.getColor() == ColorInfo.WHITE ? -1 : 1;
 		int boundaries = this.getColor() == ColorInfo.WHITE ? -7 : 0;
 
-		if (this.isMoved() == false) {
-			if (board[row + (2 * offset)][column].getPieceID() == -1) {
-				validMoves.add(point(row + (2 * offset), column));
-			}
-		}
-
-		if (offset * this.getActualPosition().getRow() > boundaries) {
-			if (board[row + offset][column].getPieceID() == -1) {
-				validMoves.add(point(row + offset, column));
-			}
-			if (column > 0) {
-				if (board[row + offset][column - 1].getPieceID() != -1 && board[row + offset][column - 1].getColor() != this.getColor()) {
-					validAttack.add(point(row + offset, column - 1));
+		if (this.isMoved() == false) { //A pawn that was not moved can be moved 2 spaces forward
+			if (board[row + (2 * side)][column].getPieceID() == -1) { // There is no piece in the square
+				if (board[row + side][column].getPieceID() == -1) { // There is no piece between the pawn and the square
+					validMoves.add(point(row + (2 * side), column));
 				}
 			}
+		}
+		
+		// Inside boundaries is, depending on the pawn side, > 0 or < 7 (or > -7)
+		if (side * this.getActualPosition().getRow() > boundaries) {
+			// There is no piece in the square
+			if (board[row + side][column].getPieceID() == -1) {
+				validMoves.add(point(row + side, column));
+			}
+			// Pawns capture diagonally
+			if (column > 0) {
+				// There is a piece to capture
+				if (board[row + side][column - 1].getPieceID() != -1 && board[row + side][column - 1].getColor() != this.getColor()) {
+					validAttack.add(point(row + side, column - 1));
+				}
+			}
+			// Pawns capture diagonally
 			if (column < 7) {
-				if (board[row + offset][column + 1].getPieceID() != -1 && board[row + offset][column + 1].getColor() != this.getColor()) {
-					validAttack.add(point(row + offset, column + 1));
+				// There is a piece to capture
+				if (board[row + side][column + 1].getPieceID() != -1 && board[row + side][column + 1].getColor() != this.getColor()) {
+					validAttack.add(point(row + side, column + 1));
 				}
 			}
 		}
@@ -69,27 +77,29 @@ public class Piece {
 	
 	public void pieceMovements(List<Coordinates> validMoves, List<Coordinates> validAttack, final Square board[][],
 			List<List<Coordinates>> possibleMoves) {
-		int row, column;
+		int row, column, i;
 
-		for (List<Coordinates> possibility : possibleMoves) {
+		for (List<Coordinates> direction : possibleMoves) { // For each possible direction
 
-			int i = 0;
-			row = this.actualPosition.getRow() + possibility.get(i).getRow();
-			column = this.actualPosition.getColumn() + possibility.get(i).getColumn();
-
-			while (i < possibility.size() && row < 8 && column < 8 && row >= 0 && column >= 0) {
-				//System.out.println("Row: " + row + " | Col: " + column);
-				if (board[row][column].getPieceID() == -1) {
+			i = 0;
+			row = this.actualPosition.getRow() + direction.get(i).getRow();
+			column = this.actualPosition.getColumn() + direction.get(i).getColumn();
+			
+			// While there is movements in that direction and its inside the board
+			while (i < direction.size() && row < 8 && column < 8 && row >= 0 && column >= 0) {
+				if (board[row][column].getPieceID() == -1) { // If there is no piece, its a valid destination
 					validMoves.add(new Coordinates(row, column));
 				} else {
-					if (board[row][column].getColor().value != this.color.value) {
+					if (board[row][column].getColor().value != this.color.value) { // If there is an enemy piece, its a valid destination
 						validAttack.add(new Coordinates(row, column));
 					}
-					break;
+					break; // If there is a piece, its not possible to keep going in that direction
 				}
-				row = this.actualPosition.getRow() + possibility.get(i).getRow();
-				column = this.actualPosition.getColumn() + possibility.get(i).getColumn();
 				i++;
+				if(i < direction.size()) {
+					row = this.actualPosition.getRow() + direction.get(i).getRow();
+					column = this.actualPosition.getColumn() + direction.get(i).getColumn();
+				}
 			}
 		}
 	}

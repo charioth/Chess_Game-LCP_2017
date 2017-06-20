@@ -98,20 +98,20 @@ public class GameState extends State {
 		int column = BoardMoviments.selectedPiece.getActualPosition().getColumn();
 		
 		//Draw purple square
-		graph.drawImage(Assets.select_square, board[row][column].renderSquare().x, board[row][column].renderSquare().y,
+		graph.drawImage(Assets.select_square, board[row][column].getRenderSquare().x, board[row][column].getRenderSquare().y,
 				Assets.getSquareSize(), Assets.getSquareSize(), null);
 
 		//For every valid position draw a blue square on the position
 		for (Coordinates valid : BoardMoviments.validMoves) {
-			graph.drawImage(Assets.move_square, board[valid.getRow()][valid.getColumn()].renderSquare().x,
-					board[valid.getRow()][valid.getColumn()].renderSquare().y, Assets.getSquareSize(),
+			graph.drawImage(Assets.move_square, board[valid.getRow()][valid.getColumn()].getRenderSquare().x,
+					board[valid.getRow()][valid.getColumn()].getRenderSquare().y, Assets.getSquareSize(),
 					Assets.getSquareSize(), null);
 		}
 		
 		//For every valid attack position draw a red square on the position
 		for (Coordinates valid : BoardMoviments.validAttack) {
-			graph.drawImage(Assets.attack_square, board[valid.getRow()][valid.getColumn()].renderSquare().x,
-					board[valid.getRow()][valid.getColumn()].renderSquare().y, Assets.getSquareSize(),
+			graph.drawImage(Assets.attack_square, board[valid.getRow()][valid.getColumn()].getRenderSquare().x,
+					board[valid.getRow()][valid.getColumn()].getRenderSquare().y, Assets.getSquareSize(),
 					Assets.getSquareSize(), null);
 		}
 	}
@@ -133,13 +133,13 @@ public class GameState extends State {
 
 				if (j == 0) //Draw a white piece
 					graph.drawImage(Assets.whitePiece[type.value],
-							board[piecePoint.getRow()][piecePoint.getColumn()].renderSquare().x,
-							board[piecePoint.getRow()][piecePoint.getColumn()].renderSquare().y, Assets.getPieceSize(),
+							board[piecePoint.getRow()][piecePoint.getColumn()].getRenderSquare().x,
+							board[piecePoint.getRow()][piecePoint.getColumn()].getRenderSquare().y, Assets.getPieceSize(),
 							Assets.getPieceSize(), null);
 				else //Draw a black piece
 					graph.drawImage(Assets.blackPiece[type.value],
-							board[piecePoint.getRow()][piecePoint.getColumn()].renderSquare().x,
-							board[piecePoint.getRow()][piecePoint.getColumn()].renderSquare().y, Assets.getPieceSize(),
+							board[piecePoint.getRow()][piecePoint.getColumn()].getRenderSquare().x,
+							board[piecePoint.getRow()][piecePoint.getColumn()].getRenderSquare().y, Assets.getPieceSize(),
 							Assets.getPieceSize(), null);
 			}
 		}
@@ -306,7 +306,7 @@ public class GameState extends State {
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				board[i][j] = new Square();
-				board[i][j].renderSquare(new Rectangle(move(j), move(i), Assets.getPieceSize(), Assets.getPieceSize()));
+				board[i][j].setRenderSquare(new Rectangle(move(j), move(i), Assets.getPieceSize(), Assets.getPieceSize()));
 			}
 		}
 
