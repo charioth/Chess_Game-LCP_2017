@@ -11,10 +11,13 @@ public class DatabaseConnection {
 		
 	}
 	
-	public Connection newConnection() {
+	public static Connection newConnection() {
 		try {
-	        return DriverManager.getConnection("Caminho", "user", "password");
+			// Load JDBC driver
+			Class.forName("com.mysql.jdbc.Driver"); // Talvez seja desnecessario: https://docs.oracle.com/javase/8/docs/api/java/sql/DriverManager.html
+	        return DriverManager.getConnection("jdbc:mysql://localhost:3306/TheLastChessGame", "user", "password");
 	    } catch (Exception e) {
+	    	System.out.println("Problem connecting with database");
 	        e.printStackTrace();
 	        throw new RuntimeException(e);
 	    }

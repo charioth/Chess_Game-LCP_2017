@@ -12,7 +12,7 @@ public class LoadGame {
 
 	// Mudar o void para os dados que vão ser retornados, int, e etc...
 	public void loadPieces() throws Exception {
-		this.connection = new DatabaseConnection().newConnection();
+		this.connection = DatabaseConnection.newConnection();
 		// Executando a query
 		Statement stmt = connection.createStatement();
 
