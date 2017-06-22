@@ -8,10 +8,11 @@ import game.Coordinates;
 import game.Square;
 
 public class Piece {
-	protected Coordinates actualPosition;
-	protected PieceInfo type;
-	protected boolean moved;
-	protected ColorInfo color;
+	private Coordinates actualPosition;
+	private int index; //Position of the piece on the pieceList
+	private PieceInfo type;
+	private boolean moved;
+	private ColorInfo color;
 
 	public Piece() {
 
@@ -134,5 +135,13 @@ public class Piece {
 
 	public void setColor(ColorInfo color) {
 		this.color = color;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
 	}
 }

@@ -98,9 +98,7 @@ public class BoardMoviments {
 		// Capture enemy piece
 		if ((board[row][column].getPieceID() >= 0)) {
 			// Erase from pieceBox
-			pieceBox[adversaryColor].getPieces()[board[row][column].getPieceID()].setColor(null);
-			pieceBox[adversaryColor].getPieces()[board[row][column].getPieceID()].setActualPosition(null);
-			pieceBox[adversaryColor].getPieces()[board[row][column].getPieceID()].setType(null);
+			pieceBox[adversaryColor].getPieces()[board[row][column].getPieceID()].setType(PieceInfo.DEAD);
 		}
 		piece.setMoved(true);
 		piece.setActualPosition(point(row, column));
@@ -114,6 +112,7 @@ public class BoardMoviments {
 	}
 
 	public static boolean isChecked(final Square board[][]) {
+		
 		return true; // check method
 	}
 

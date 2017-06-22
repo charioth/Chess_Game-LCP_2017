@@ -34,6 +34,11 @@ public class PieceList {
 		for (int i = 0; i < 8; i++) {
 			pieces[i + 8] = new Piece(new Coordinates(pos + 1, i), PieceInfo.PAWN, false, color);
 		}
+		
+		for(int i = 0 ; i < 16 ; i++)
+		{
+			pieces[i].setIndex(i);
+		}
 	}
 
 	public Piece[] getPieces() {

@@ -128,7 +128,7 @@ public class GameState extends State {
 				Coordinates piecePoint = pieceBox[j].getPieces()[i].getActualPosition();
 
 				//If the color is null than this piece is death so continue
-				if (color == null)
+				if (type == PieceInfo.DEAD)
 					continue;
 
 				if (j == 0) //Draw a white piece
