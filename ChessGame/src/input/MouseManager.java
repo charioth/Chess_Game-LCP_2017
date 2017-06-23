@@ -4,10 +4,12 @@ import java.awt.event.MouseEvent;
 
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
 import states.State;
 
-public class MouseManager implements MouseListener, MouseMotionListener {
+public class MouseManager implements MouseListener, MouseMotionListener, MouseWheelListener {
 	/* Mouse manager class it implement the actions on the click of the left mouse
 	 * and keep track of the actual position of the mouse on the screen*/
 	private boolean leftButton;
@@ -58,6 +60,11 @@ public class MouseManager implements MouseListener, MouseMotionListener {
 		if (State.getCurrentState().getUIButtons() != null) {
 			State.getCurrentState().getUIButtons().bMouseRelease();
 		}
+		
+		if(State.getCurrentState().getScreen() != null) {
+			State.getCurrentState().getScreen().sMouseRelease();
+		}
+		
 	}
 
 	@Override
@@ -85,6 +92,16 @@ public class MouseManager implements MouseListener, MouseMotionListener {
 		if (State.getCurrentState().getUIButtons() != null) {
 			State.getCurrentState().getUIButtons().bMouseMoved(mouse);
 		}
+		if(State.getCurrentState().getScreen() != null) {
+			State.getCurrentState().getScreen().sMouseMoved(mouse);
+		}
+	}
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent mouse) {
+		if(State.getCurrentState().getScreen() != null) {
+			State.getCurrentState().getScreen().sMouseScroll(mouse);
+		}	
 	}
 
 }

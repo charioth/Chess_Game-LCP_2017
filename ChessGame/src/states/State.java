@@ -4,6 +4,7 @@ import java.awt.Graphics;
 
 import game.Game;
 import graphics.UIList;
+import graphics.UIScrollScreen;
 
 public abstract class State {
 	/*Super class that every state of the game extends
@@ -29,7 +30,9 @@ public abstract class State {
 
 	//List of buttons that the state has to call
 	public abstract UIList getUIButtons();
-
+	
+	public abstract UIScrollScreen getScreen();
+	
 	public abstract void tick();
 
 	public abstract void render(Graphics graph);
