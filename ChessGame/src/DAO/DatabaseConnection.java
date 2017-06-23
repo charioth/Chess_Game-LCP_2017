@@ -15,7 +15,7 @@ public class DatabaseConnection {
 		try {
 			// Load JDBC driver
 			Class.forName("com.mysql.jdbc.Driver"); // Talvez seja desnecessario: https://docs.oracle.com/javase/8/docs/api/java/sql/DriverManager.html
-	        return DriverManager.getConnection("jdbc:mysql://localhost:3306/TheLastChessGame", "user", "password");
+	        return DriverManager.getConnection("jdbc:mysql://localhost:3306/thelastchessgame", "root", "pass");
 	    } catch (Exception e) {
 	    	System.out.println("Problem connecting with database");
 	        e.printStackTrace();
