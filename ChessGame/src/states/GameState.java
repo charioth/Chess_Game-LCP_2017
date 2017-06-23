@@ -12,6 +12,7 @@ import game.Square;
 import graphics.ButtonAction;
 import graphics.UIButton;
 import graphics.UIList;
+import graphics.UIScrollScreen;
 import pieces.PieceInfo;
 import pieces.PieceList;
 import tempassets.Assets;
@@ -40,6 +41,11 @@ public class GameState extends State {
 		initUIButton();
 	}
 
+	@Override
+	public UIScrollScreen getScreen() {
+		return null;
+	}
+	
 	@Override
 	public void tick() {
 		/*tick method that runs 60 times per second*/
@@ -124,7 +130,6 @@ public class GameState extends State {
 			for (int i = 0; i < 16; i++) { //Draw all pieces on the pieceBox
 				//Get pieces info to draw
 				PieceInfo type = pieceBox[j].getPieces()[i].getType();
-				ColorInfo color = pieceBox[j].getPieces()[i].getColor();
 				Coordinates piecePoint = pieceBox[j].getPieces()[i].getActualPosition();
 
 				//If the color is null than this piece is death so continue

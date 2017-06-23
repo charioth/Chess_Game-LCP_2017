@@ -16,9 +16,10 @@ public class UIButton {
 	BufferedImage button[];
 	Rectangle bound;
 	ButtonAction click;
-
+	Text text;
+	
 	//Passing the ButtonAction as parameter is possible to program the button when creating it
-	public UIButton(int x, int y, int width, int height, BufferedImage button[], ButtonAction click) {
+	public UIButton(int x, int y, int width, int height, BufferedImage button[],ButtonAction click) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -27,6 +28,51 @@ public class UIButton {
 		onButton = false;
 		bound = new Rectangle(x, y, width, height);
 		this.click = click;
+		this.text = null;
+	}
+	
+	public int getX() {
+		return x;
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public UIButton(int x, int y, int width, int height, BufferedImage button[], Text text,ButtonAction click) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+		this.button = button;
+		onButton = false;
+		bound = new Rectangle(x, y, width, height);
+		this.click = click;
+		this.text = text;
 	}
 
 	//If there was a action that the button should execute it would be necessary to program here
@@ -39,6 +85,10 @@ public class UIButton {
 		
 		/*If onButton false it means that the mouse is not on the button so use the first image
 		 * if is true than render the second image*/
+		if(text != null)
+		{
+			text.render(graph);
+		}
 		if (onButton == false) {
 			graph.drawImage(button[0], x, y, width, height, null);
 		} else {
