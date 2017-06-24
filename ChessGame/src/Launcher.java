@@ -12,10 +12,10 @@ public class Launcher {
 	{
 		
 		//Inicializando o Acesso ao banco
-		//*********PASSAR ESSA INSTANCIA PARA O MÉTODO RESPONSÁVEL PELO LOAD*******************
-		/*Connection con = null;
+		//*********PASSAR ESSA INSTANCIA PARA O Mï¿½TODO RESPONSï¿½VEL PELO LOAD*******************
+		Connection con = null;
 		con = DatabaseConnection.newConnection();
-		if(con != null) System.out.println("AEE PORRA");*/
+		if(con != null) System.out.println("AEE PORRA");
 		Game game  = new Game("ChessGame", 0.8f);
 		
 		game.start();

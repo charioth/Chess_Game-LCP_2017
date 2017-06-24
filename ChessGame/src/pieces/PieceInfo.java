@@ -9,4 +9,6 @@ public enum PieceInfo {
 	PieceInfo(int value) {
 		this.value = value;
 	}
+	
+	
 }
