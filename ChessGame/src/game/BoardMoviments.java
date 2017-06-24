@@ -111,12 +111,27 @@ public class BoardMoviments {
 		selectedPiece = null;
 	}
 
-	public static boolean isChecked(final Square board[][]) {
+	public static boolean isChecked(final Square board[][], PieceList pieceBox[]) {
+		List<Coordinates> validMoves;
+		List<Coordinates> validAttack;
 		
-		return true; // check method
+		validMoves = new ArrayList<Coordinates>();
+		validAttack = new ArrayList<Coordinates>();
+		
+		selectedPiece.move(validMoves, validAttack, board, possiblePiecesMovements.get(selectedPiece.getType()));
+		
+		for(Coordinates c : validAttack)
+		{
+			int PieceID = board[c.getRow()][c.getColumn()].getPieceID();
+			if(0 == PieceID)
+				return true;
+		}
+		
+		return false; // check method
 	}
 
 	public static boolean isCheckmated(final Square board[][]) {
+		
 		return true; // checkmate method
 	}
 

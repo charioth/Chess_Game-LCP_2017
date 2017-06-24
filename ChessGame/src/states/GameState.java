@@ -214,6 +214,7 @@ public class GameState extends State {
 								if (subMenu) {
 									subMenu = false;
 									game.getKeyboard().mESC = false; //Set ESC key to not pressed
+									//SaveGame.save(actualTurn.value, pieceBox);
 									State.setCurrentState(game.getMenuState()); //Change to menu state
 								}
 							}
