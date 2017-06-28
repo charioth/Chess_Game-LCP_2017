@@ -12,32 +12,29 @@ import pieces.PieceList;
 
 public class LoadGame {
 
-	Connection connection;
+	private static Connection connection;
 
 	public LoadGame() {
 
 	}
 
-	// Mudar o void para os dados que v�o ser retornados, int, e etc...
-	public void loadPieces(String gameName, PieceList pieceBox[]) throws Exception {
-		this.connection = DatabaseConnection.newConnection();
-		// Executando a query
-		Statement stmt = connection.createStatement();
+	public static void loadGame(String gameName, PieceList pieceBox[], ColorInfo actualTurn) throws Exception {
+		connection = DatabaseConnection.newConnection(); //Connect to database
+		Statement stmt = connection.createStatement(); //Creates a Statement object for sending SQL statements to the database
 
 		try {
-			// Select do estado inicial do game e do game com save(table -> nome
-			// da tabela)
-			String sql = "SELECT * FROM piece WHERE game_name = '" + gameName + "'" ;
-
+			/*Load whose turn it is*/
+			String sql  = "SELECT turn FROM save_game WHERE game_name = '" + gameName + "'" ;
 			ResultSet rs = stmt.executeQuery(sql);
-
-			// Extraindo data do resultado
-			while (rs.next()) {
-				/*
-				 * Pegando o nome das colunas, exemplo int id = rs.getInt("id");
-				 * 
-				 */
-				int piece = rs.getInt("piece");
+			actualTurn = ColorInfo.values()[rs.getInt("turn")];
+			
+			/*Load all pieces*/
+			sql = "SELECT * FROM piece WHERE game_name = '" + gameName + "'" ;
+			rs = stmt.executeQuery(sql);
+			
+			/*Initialize the piecebox with each piece information*/
+			while (rs.next())
+			{
 				int coord_row = rs.getInt("coord_row");
 				int coord_column = rs.getInt("coord_column");
 				int piece_type = rs.getInt("piece_type");
@@ -45,70 +42,74 @@ public class LoadGame {
 				int piece_color = rs.getInt("piece_color");
 				int index = rs.getInt("index");
 				
-				//TODO - Verificar o enum
-				pieceBox[piece_color].getPieces()[index] = new Piece(new Coordinates(coord_row, coord_column) , 1, moved, piece_color);
+				pieceBox[piece_color].getPieces()[index] = new Piece(new Coordinates(coord_row, coord_column),
+																PieceInfo.values()[piece_type], moved, ColorInfo.values()[piece_color]);
 			}
-			// Fechando a conexao do resultado
 			rs.close();
-			connection.close();
-		} catch (Exception se) {
-			// Lidando com os SQLExceptions
-			se.printStackTrace();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
-			// Bloqueia uso para encerramento de recursos
 			try {
-				if (stmt != null)
-					connection.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
+				if (stmt != null) {
+					connection.close(); //Close database connection
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 			try {
-				if (connection != null)
-					connection.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
+				if (connection != null) {
+					connection.close(); //Close database connection
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 		}
 	}
 	
-	public List<String> loadNames()throws Exception{
+	public static List<String> loadNames() throws Exception{
 		
-		List<String> names = new ArrayList<String>(); 
+		List<String> games = new ArrayList<String>();
 		
-		this.connection = DatabaseConnection.newConnection();
-		// Executando a query
-		Statement stmt = connection.createStatement();
+		connection = DatabaseConnection.newConnection(); //Connect to database
+
+		Statement stmt = connection.createStatement(); //Creates a Statement object for sending SQL statements to the database
 		
 		try{
+			/*Get all saved games*/
 			String sql = " SELECT * FROM save_game";
-			
 			ResultSet rs = stmt.executeQuery(sql);
 			
+			/*Add to the list all saved game names and dates*/
 			while(rs.next()){
-				names.add(rs.getString("name") + " " + rs.getString("save_date"));
+				games.add(rs.getString("name") + "	" + rs.getString("save_date"));
 			}
 			rs.close();
-			connection.close();
 			
 		}catch(Exception e){
 			e.printStackTrace();
+			throw new RuntimeException(e);
 		}finally {
-			// Bloqueia uso para encerramento de recursos
 			try {
-				if (stmt != null)
-					connection.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
+				if (stmt != null) {
+					connection.close(); //Close database connection
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 			try {
-				if (connection != null)
-					connection.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
+				if (connection != null) {
+					connection.close(); //Close database connection
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 		}
 		
-		return names;
+		return games; //Return the list
 	}
-
 }

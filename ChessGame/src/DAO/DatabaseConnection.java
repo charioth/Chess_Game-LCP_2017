@@ -1,21 +1,17 @@
 package DAO;
 
-
 import java.sql.*;
 
-
 public class DatabaseConnection {
-	//M�todo para pegar a conex�o com o banco
 	
 	public DatabaseConnection() {
 		
 	}
 	
-	public static Connection newConnection() {
+	public static Connection newConnection() throws Exception {
 		try {
-			// Load JDBC driver
-			Class.forName("com.mysql.jdbc.Driver"); // Talvez seja desnecessario: https://docs.oracle.com/javase/8/docs/api/java/sql/DriverManager.html
-	        return DriverManager.getConnection("jdbc:mysql://localhost:3306/PieceInfo", "root", "manesinho");
+			Class.forName("com.mysql.jdbc.Driver"); //Load JDBC driver
+	        return DriverManager.getConnection("jdbc:mysql://localhost:3306/TheLastChessGame", "root", "pass"); //Return connection with database
 	    } catch (Exception e) {
 	    	System.out.println("Problem connecting with database");
 	        e.printStackTrace();

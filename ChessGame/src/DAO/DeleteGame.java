@@ -6,38 +6,45 @@ import java.sql.Statement;
 
 public class DeleteGame {
 
-	private Connection connection;
+	private static Connection connection;
 
 	public DeleteGame() {
 
 	}
 
-	public void Delete(String gameName) throws Exception {
-		this.connection = DatabaseConnection.newConnection();
-		Statement stmt = connection.createStatement();
-		
+	public static void Delete(String gameName) throws Exception {
+		connection = DatabaseConnection.newConnection(); //Connect to database
+		Statement stmt = connection.createStatement(); //Creates a Statement object for sending SQL statements to the database
+
 		try {
-			String sql = " DELETE * FROM piece WHERE gameName = " + gameName;
+			/* Delete the pieces from the game*/
+			String sql = " DELETE * FROM piece WHERE gameName = '" + gameName + "'";
 			stmt.executeUpdate(sql);
-			 sql = " DELETE * FROM save_game WHERE name = " + gameName;
-			System.out.println("Deleted");
+			
+			/* Detele the game*/
+			sql = " DELETE * FROM save_game WHERE name = " + gameName + "'";
+			stmt.executeUpdate(sql);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
+			throw new RuntimeException(e);
 		} finally {
-			// Bloqueia uso para encerramento de recursos
 			try {
-				if (stmt != null)
-					connection.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
+				if (stmt != null) {
+					connection.close(); //Close database connection
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 			try {
-				if (connection != null)
-					connection.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
+				if (connection != null) {
+					connection.close(); //Close database connection
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 		}
 	}
-
 }
