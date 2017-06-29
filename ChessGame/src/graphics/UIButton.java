@@ -13,13 +13,13 @@ public class UIButton {
 	 * and last the buttonAction that tell what the button should execute when clicked*/
 	private int x, y, width, height;
 	private boolean onButton;
-	BufferedImage button[];
-	Rectangle bound;
-	ButtonAction click;
-	Text text;
+	private BufferedImage button[];
+	private Rectangle bound;
+	private ButtonAction click;
+	private Text text;
 	
 	//Passing the ButtonAction as parameter is possible to program the button when creating it
-	public UIButton(int x, int y, int width, int height, BufferedImage button[],ButtonAction click) {
+	public UIButton(int x, int y, int width, int height, BufferedImage button[], ButtonAction click) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -29,6 +29,54 @@ public class UIButton {
 		bound = new Rectangle(x, y, width, height);
 		this.click = click;
 		this.text = null;
+	}
+	
+	public UIButton(int x, int y, int width, int height, BufferedImage button[], Text text,ButtonAction click) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+		this.button = button;
+		onButton = false;
+		bound = new Rectangle(x, y, width, height);
+		this.click = click;
+		this.text = text;
+	}
+
+	public void render(Graphics graph) {
+		/*Method responsible to render the button on the screen*/
+		
+		/*If onButton false it means that the mouse is not on the button so use the first image
+		 * if is true than render the second image*/
+		if (onButton == false) {
+			graph.drawImage(button[0], x, y, width, height, null);
+		} else {
+			graph.drawImage(button[1], x, y, width, height, null);
+		}
+		if(text != null)
+		{
+			text.render(graph);
+		}
+
+	}
+
+	public void bMouseMoved(MouseEvent mouse) {
+		/*Method responsible for checking if the mouse coordinates is in bounds with
+		 * the button area, if true, than onButton should be true to render the second image
+		 * if not then on button is false*/
+		if (bound.contains(mouse.getX(), mouse.getY())) {
+			onButton = true;
+		} else {
+			onButton = false;
+		}
+	}
+
+	public void bMouseRelease() {
+		//If the mouse is on button than call the action method that execute the action
+		if (onButton) {
+			onButton = false;
+			click.action();
+		}
 	}
 	
 	public int getX() {
@@ -63,56 +111,26 @@ public class UIButton {
 		this.height = height;
 	}
 
-	public UIButton(int x, int y, int width, int height, BufferedImage button[], Text text,ButtonAction click) {
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-		this.button = button;
-		onButton = false;
-		bound = new Rectangle(x, y, width, height);
-		this.click = click;
+	public Text getText()
+	{
+		return text;
+	}
+	
+	public void setText(Text text)
+	{
 		this.text = text;
 	}
-
+	
 	//If there was a action that the button should execute it would be necessary to program here
 	public void tick() {
 
 	}
 
-	public void render(Graphics graph) {
-		/*Method responsible to render the button on the screen*/
-		
-		/*If onButton false it means that the mouse is not on the button so use the first image
-		 * if is true than render the second image*/
-		if(text != null)
-		{
-			text.render(graph);
-		}
-		if (onButton == false) {
-			graph.drawImage(button[0], x, y, width, height, null);
-		} else {
-			graph.drawImage(button[1], x, y, width, height, null);
-		}
-
+	public Rectangle getBound() {
+		return bound;
 	}
 
-	public void bMouseMoved(MouseEvent mouse) {
-		/*Method responsible for checking if the mouse coordinates is in bounds with
-		 * the button area, if true, than onButton should be true to render the second image
-		 * if not then on button is false*/
-		if (bound.contains(mouse.getX(), mouse.getY())) {
-			onButton = true;
-		} else {
-			onButton = false;
-		}
-	}
-
-	public void bMouseRelease() {
-		//If the mouse is on button than call the action method that execute the action
-		if (onButton) {
-			onButton = false;
-			click.action();
-		}
+	public void setBound(Rectangle bound) {
+		this.bound = bound;
 	}
 }

@@ -1,6 +1,7 @@
 package states;
 
 import java.awt.Graphics;
+import java.util.ArrayList;
 
 import game.Game;
 import graphics.UIList;
@@ -12,6 +13,7 @@ public abstract class State {
 	private static State currentState = null;
 	protected static boolean newGame;
 	protected static boolean loadGame;
+	protected static ArrayList<String> savedGames = new ArrayList<>();;
 	protected Game game;
 
 	State(Game game) {

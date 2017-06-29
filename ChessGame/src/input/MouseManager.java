@@ -56,14 +56,14 @@ public class MouseManager implements MouseListener, MouseMotionListener, MouseWh
 			leftButton = false;
 		}
 
-		//If there is a button list on the current state, call it and execute the MouseRelease of each button
-		if (State.getCurrentState().getUIButtons() != null) {
-			State.getCurrentState().getUIButtons().bMouseRelease();
-		}
-		
 		if(State.getCurrentState().getScreen() != null) {
 			State.getCurrentState().getScreen().sMouseRelease();
 		}
+		//If there is a button list on the current state, call it and execute the MouseRelease of each button
+		else if (State.getCurrentState().getUIButtons() != null) {
+			State.getCurrentState().getUIButtons().bMouseRelease();
+		}
+		
 		
 	}
 
@@ -89,17 +89,17 @@ public class MouseManager implements MouseListener, MouseMotionListener, MouseWh
 	public void mouseMoved(MouseEvent mouse) {
 		/*Every mouse movement this method is called and it checks if the current
 		 * state has a button list, if it is true then call the mouseMoved method of each button on the list*/
-		if (State.getCurrentState().getUIButtons() != null) {
-			State.getCurrentState().getUIButtons().bMouseMoved(mouse);
-		}
 		if(State.getCurrentState().getScreen() != null) {
 			State.getCurrentState().getScreen().sMouseMoved(mouse);
+		}
+		else if (State.getCurrentState().getUIButtons() != null) {
+			State.getCurrentState().getUIButtons().bMouseMoved(mouse);
 		}
 	}
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent mouse) {
-		if(State.getCurrentState().getScreen() != null) {
+		if((State.getCurrentState().getScreen() != null)) {
 			State.getCurrentState().getScreen().sMouseScroll(mouse);
 		}	
 	}
