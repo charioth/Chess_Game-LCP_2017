@@ -17,19 +17,29 @@ public class MenuState extends State {
 	 * Menu screen state it is the initial screen of the game it control the new
 	 * button and the load button
 	 */
-	private UIList UIButtons;
+	private UIList menuButtons;
+	private UIList loadSubMenu;
 	private UIScrollScreen loadScreen;
 	private boolean loadMenu;
+	private boolean gameSelected;
 	
 	public MenuState(Game game) {
 		super(game);
+		savedGames.add("Teste Button 1");
+		savedGames.add("Teste Button 2");
+		savedGames.add("Teste Button 3");
+		savedGames.add("Teste Button 4");
 		initUIButton();
 		initLoadScreen();
 	}
 
 	@Override
 	public UIList getUIButtons() {
-		return UIButtons;
+		if(!gameSelected){			
+			return menuButtons;
+		} else {
+			return loadSubMenu;
+		}
 	}
 
 	@Override
@@ -47,7 +57,11 @@ public class MenuState extends State {
 			if(!loadMenu){				
 				game.stop();
 			} else {
-				loadMenu = false;
+				if(gameSelected) {
+					gameSelected = false;
+				} else {					
+					loadMenu = false;
+				}
 				game.getKeyboard().mESC = false;
 			}
 		}
@@ -57,19 +71,25 @@ public class MenuState extends State {
 	public void render(Graphics graph) {
 		// Draw the menu background image and render the UI buttons
 		graph.drawImage(Assets.menuBackground, 0, 0, game.width, game.height, null);
-		UIButtons.render(graph);
+		menuButtons.render(graph);
 		
 		if(loadMenu)
+		{
 			loadScreen.render(graph);
+		} else if(gameSelected) {	
+			loadSubMenu.render(graph);
+		}
 	}
 	
 	private void initLoadScreen() {
 		loadScreen = new UIScrollScreen(Assets.loadScreen, (game.width)/2 - (Assets.loadScreen.getWidth()/2), (game.height)/2 - (Assets.loadScreen.getHeight()/2) + 100, 
 				Assets.loadScreen.getWidth(), Assets.loadScreen.getHeight()/2, 10);
+		loadSubMenu = new UIList();
 		
 		float buttonWidth = Assets.loadButton[0].getWidth() * game.scale;
 		float buttonHeight = Assets.loadButton[0].getHeight() * game.scale;
 
+		System.out.println(savedGames.size());
 		Font font = new Font("Verndana", Font.PLAIN, 20);
 		for(int i = 0, accumulator = 0 ; (int) i < savedGames.size() ; i++ ) {
 			loadScreen.getButtons()
@@ -77,12 +97,37 @@ public class MenuState extends State {
 					(int) (game.scale * buttonHeight), Assets.loadButton, new Text(savedGames.get(i), font, Color.blue, (int)((game.width / 2) - (buttonWidth / 2) + 10 * game.scale), accumulator + (int)(buttonHeight/2)), 
 					new ButtonAction() {
 						public void action() {
-							System.out.println("Clicked");
-							State.setCurrentState(game.getMenuState());
+							gameSelected = true;
+							loadMenu = false;
 						}
-					})); // MUDAR PARA LOAD
+					}));
 			accumulator += buttonHeight;
 		}
+		
+		loadSubMenu.getButtons().add(new UIButton(0, 0, Assets.buttonYes[0].getWidth(), Assets.buttonYes[0].getHeight(), Assets.buttonYes,
+				new ButtonAction() {
+					
+					@Override
+					public void action() {
+						System.out.println("LOAD SAVED GAME");
+						gameSelected = false;
+						loadGame = false;
+						State.setCurrentState(game.getGameState());
+					}
+				}));
+		
+		loadSubMenu.getButtons().add(new UIButton(0, (int)((game.width  - 100) * game.scale), Assets.buttonNo[0].getWidth(), Assets.buttonNo[0].getHeight(), Assets.buttonNo,
+				new ButtonAction() {
+					
+					@Override
+					public void action() {
+						System.out.println("DELETE GAME");
+						gameSelected = false;
+						loadGame = false;
+						State.setCurrentState(game.getGameState());
+						
+					}
+				}));
 	}
 
 	private void initUIButton() {
@@ -90,7 +135,7 @@ public class MenuState extends State {
 		float buttonWidth = Assets.buttonLoadGame[0].getWidth() * game.scale;
 		float buttonHeight = Assets.buttonLoadGame[0].getHeight() * game.scale;
 
-		UIButtons = new UIList();
+		menuButtons = new UIList();
 
 		/*
 		 * Creates the load button and add to the UI button list, the first two
@@ -100,7 +145,7 @@ public class MenuState extends State {
 		 * defined when passing the argument, this way is possible to program
 		 * the button when creating it
 		 */
-		UIButtons.getButtons()
+		menuButtons.getButtons()
 				.add(new UIButton((int) ((game.width / 2) - (buttonWidth / 2)),
 						(int) ((game.height - game.height / 3) + buttonHeight), (int) (buttonWidth),
 						(int) (game.scale * buttonHeight), Assets.buttonLoadGame, new ButtonAction() {
@@ -122,7 +167,7 @@ public class MenuState extends State {
 		 * defined when passing the argument, this way is possible to program
 		 * the button when creating it
 		 */
-		UIButtons.getButtons()
+		menuButtons.getButtons()
 				.add(new UIButton((int) ((game.width / 2) - (buttonWidth / 2)), (int) ((game.height - game.height / 3)),
 						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonNewGame, new ButtonAction() {
 							public void action() {
