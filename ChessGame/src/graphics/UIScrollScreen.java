@@ -10,103 +10,83 @@ import java.util.ArrayList;
 public class UIScrollScreen {
 
 	private ArrayList<UIButton> buttons;
-	private int x, y, width, height, screenCenterX, screenCenterY, activeCount, counter;
+	private Rectangle screen;
 	private boolean onScreen;
-	BufferedImage screen;
-	Rectangle bound;
+	private int speed;
+	private BufferedImage screenImage;
 
-	public UIScrollScreen(BufferedImage screen, int x, int y, int width, int height, int activeCount) {
+	public UIScrollScreen(BufferedImage screenImage, int x, int y, int width, int height, int speed) {
 		buttons = new ArrayList<>();
-		this.screen = screen;
-		bound = new Rectangle(x, y, width, height);
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-		this.activeCount = activeCount;
-		screenCenterX = (width / 2) + x;
-		screenCenterY = (height / 2) + y;
-		counter = 0;
+		screen = new Rectangle(x, y, width, height);
+		this.screenImage = screenImage;
+		this.speed = speed;
+	}
+
+	public ArrayList<UIButton> getButtons() {
+		return buttons;
+	}
+
+	public void setButtons(ArrayList<UIButton> buttons) {
+		this.buttons = buttons;
 	}
 
 	public void tick() {
-		for (int i = counter; i < activeCount; i++) {
-			buttons.get(i).tick();
+		for (int i = 0; i < buttons.size(); i++) {
+			if(screen.contains(buttons.get(i).getX(), buttons.get(i).getY()) && (screen.contains(buttons.get(i).getX(), buttons.get(i).getY() + buttons.get(i).getHeight())))
+				buttons.get(i).tick();
 		}
 	}
 
 	public void render(Graphics graph) {
-		graph.drawImage(screen, x, y, width, height, null);
-		for (int i = counter; i < activeCount; i++) {
-			buttons.get(i).render(graph);
+		graph.drawImage(screenImage, (int)screen.getX(), (int)screen.getY(), (int)screen.getWidth(), (int)screen.getHeight(), null);
+		for (int i = 0; i < buttons.size(); i++) {
+			if(screen.contains(buttons.get(i).getX(), buttons.get(i).getY()) && (screen.contains(buttons.get(i).getX(), buttons.get(i).getY() + buttons.get(i).getHeight())))
+				buttons.get(i).render(graph);
 		}
 	}
 
 	public void sMouseMoved(MouseEvent mouse) {
-		if (bound.contains(mouse.getX(), mouse.getY())) {
+		if (screen.contains(mouse.getX(), mouse.getY()) ) {
 			onScreen = true;
-			for (int i = counter; i < activeCount; i++) {
-				buttons.get(i).bMouseMoved(mouse);
+			for (int i = 0; i < buttons.size(); i++) {
+				if(screen.contains(buttons.get(i).getX(), buttons.get(i).getY()) && (screen.contains(buttons.get(i).getX(), buttons.get(i).getY() + buttons.get(i).getHeight())))
+				buttons.get(i).bMouseMoved(mouse);;
 			}
-		} else {
+		}
+		else
+		{
 			onScreen = false;
 		}
-
 	}
 
 	public void sMouseRelease() {
 		if (onScreen) {
 			onScreen = false;
-			for (int i = counter; i < activeCount; i++) {
-				buttons.get(i).bMouseRelease();
+			for (int i = 0; i < buttons.size(); i++) {
+				if(screen.contains(buttons.get(i).getX(), buttons.get(i).getY()) && (screen.contains(buttons.get(i).getX(), buttons.get(i).getY() + buttons.get(i).getHeight())))
+					buttons.get(i).bMouseRelease();
 			}
 		}
 	}
 
-	void rollDown() {
-		for (int i = counter; i < activeCount; i++) {
-			buttons.get(i).setX(buttons.get(i - 1).getX());
-			buttons.get(i).setX(buttons.get(i - 1).getY());
-		}
-	}
-
-	void rollUp() {
-		for (int i = counter; i > 0; i++) {
-			buttons.get(i - 1).setX(buttons.get(i).getX());
-			buttons.get(i - 1).setX(buttons.get(i).getY());
-		}
-	}
 
 	public void sMouseScroll(MouseWheelEvent mouse) {
 		int rotation = mouse.getWheelRotation();
-		System.out.println("SCROLL");
-		if (rotation < 0) {
-			if (counter != 0) {
-				counter--;
-				rollDown();
+		if(onScreen)
+		{
+			if(buttons.size() > 0)
+			{
+				boolean holdScrollUp = (screen.contains(buttons.get(buttons.size() - 1).getX(), buttons.get(buttons.size() - 1).getY() + buttons.get(buttons.size() - 1).getHeight())) && (rotation < 0);
+				boolean holdScrollDown = (screen.contains(buttons.get(0).getX(), buttons.get(0).getY()) && (rotation > 0));
+				if(holdScrollDown || holdScrollUp)
+					return;
 			}
-		} else {
-			if (counter < (buttons.size() - activeCount)) {
-				counter++;
-				rollUp();
-			}
+			for (int i = 0; i < buttons.size(); i++) {
+				buttons.get(i).setY(buttons.get(i).getY() + (rotation * speed));
+				buttons.get(i).getText().setY(buttons.get(i).getText().getY() + (rotation * speed));
+				buttons.get(i).getBound().setLocation(buttons.get(i).getX(), buttons.get(i).getY());
+			}			
 		}
-	}
-
-	public int getScreenCenterX() {
-		return screenCenterX;
-	}
-
-	public void setScreenCenterX(int screenCenterX) {
-		this.screenCenterX = screenCenterX;
-	}
-
-	public int getScreenCenterY() {
-		return screenCenterY;
-	}
-
-	public void setScreenCenterY(int screenCenterY) {
-		this.screenCenterY = screenCenterY;
 	}
 
 }

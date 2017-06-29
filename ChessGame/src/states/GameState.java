@@ -91,7 +91,7 @@ public class GameState extends State {
 			renderSubMenu(graph); // Draw the subMenu if esc key was pressed
 
 		if (endGame) { // Draw the winner msg
-			graph.drawImage(winnerMessage, (int)((game.width/2) - (winnerMessage.getWidth()/2 * game.scale)), (int)(game.height/2), (int) (winnerMessage.getWidth() * game.scale),
+			graph.drawImage(winnerMessage, 0, 0, (int) (winnerMessage.getWidth() * game.scale),
 					(int) (winnerMessage.getHeight() * game.scale), null);
 		}
 	}

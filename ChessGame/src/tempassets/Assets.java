@@ -40,6 +40,8 @@ public class Assets {
 	public static BufferedImage[] buttonYes;
 	public static BufferedImage[] buttonNo;
 	public static BufferedImage[] congratz;
+	public static BufferedImage[] loadButton;
+	public static BufferedImage loadScreen;
 	public static BufferedImage draw;
 
 	public static void init(Game game) {
@@ -54,6 +56,7 @@ public class Assets {
 		buttonYes = new BufferedImage[2];
 		buttonNo = new BufferedImage[2];
 		congratz =  new BufferedImage[2];
+		loadButton = new BufferedImage[2];
 		
 		try {
 			/*Import all images used on the program*/
@@ -80,9 +83,12 @@ public class Assets {
 			buttonNo[1] = ImageIO.read(Assets.class.getResource("/button/no_b.png"));
 			acceptDraw = ImageIO.read(Assets.class.getResource("/button/draw_request_w.png"));
 			gameLogo = ImageIO.read(Assets.class.getResource("/background/exit_logo.png"));
-			congratz[0] = ImageIO.read(Assets.class.getResource("/button/congratz_w.png"));
-			congratz[1] = ImageIO.read(Assets.class.getResource("/button/congratz_b.png"));
+			congratz[0] = ImageIO.read(Assets.class.getResource("/background/congratulations_white.png"));
+			congratz[1] = ImageIO.read(Assets.class.getResource("/background/congratulations_black.png"));
 			draw = ImageIO.read(Assets.class.getResource("/button/draw_game.png"));
+			loadButton[0] = ImageIO.read(Assets.class.getResource("/button/tempButton.png"));
+			loadButton[1] = ImageIO.read(Assets.class.getResource("/button/tempButton2.png"));
+			loadScreen = ImageIO.read(Assets.class.getResource("/background/tempScreen.png"));
 			for (int i = 0; i < MAX_PIECES; i++) {
 				whitePiece[i] = ImageIO.read(Assets.class.getResource("/pieces/w_" + i + ".png"));
 				blackPiece[i] = ImageIO.read(Assets.class.getResource("/pieces/b_" + i + ".png"));

@@ -67,9 +67,11 @@ public class Game implements Runnable {
 		//For the input to work the screen must know that it should respond, so add mouse and keyboard to the Frame and Canvas
 		display.getFrame().addMouseListener(mouse);
 		display.getFrame().addMouseMotionListener(mouse);
+		display.getFrame().addMouseWheelListener(mouse);
 		display.getFrame().addKeyListener(keyboard);
 		display.getCanvas().addMouseListener(mouse);
 		display.getCanvas().addMouseMotionListener(mouse);
+		display.getCanvas().addMouseWheelListener(mouse);
 		//Set initial state (initial screen) in this case menu state
 		State.setCurrentState(menuState);
 	}
