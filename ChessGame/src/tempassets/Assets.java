@@ -36,6 +36,7 @@ public class Assets {
 	public static BufferedImage move_square;
 	public static BufferedImage attack_square;
 	public static BufferedImage select_square;
+	public static BufferedImage promote_square;
 	public static BufferedImage[] buttonContinue;
 	public static BufferedImage[] buttonYes;
 	public static BufferedImage[] buttonNo;
@@ -65,6 +66,7 @@ public class Assets {
 			move_square = ImageIO.read(Assets.class.getResource("/background/blue_square.png"));
 			attack_square = ImageIO.read(Assets.class.getResource("/background/red_square.png"));
 			select_square = ImageIO.read(Assets.class.getResource("/background/purple_square.png"));
+			promote_square = ImageIO.read(Assets.class.getResource("/background/yellow_square.png"));
 			buttonLoadGame[0] = ImageIO.read(Assets.class.getResource("/button/load_game.png"));
 			buttonNewGame[0] = ImageIO.read(Assets.class.getResource("/button/new_game.png"));
 			buttonLoadGame[1] = ImageIO.read(Assets.class.getResource("/button/load_game_b.png"));

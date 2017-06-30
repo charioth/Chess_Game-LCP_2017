@@ -92,9 +92,6 @@ public class BoardMoviments {
 		// Update the board parameters of new position
 		board[row][column].setPieceID(pieceID);
 		board[row][column].setColor(pieceColor);
-		
-		// Deselect piece
-		selectedPiece = null;
 	}
 	
 	private static boolean checkKing(Piece piece, final Square board[][], PieceList enemyPieces) {
@@ -128,6 +125,14 @@ public class BoardMoviments {
 		return true; // checkmate method
 	}
 
+	public static boolean promotePawn(Piece movedPawn)
+	{
+		boolean blackPiecePromote = ((movedPawn.getType() == PieceInfo.PAWN) && (movedPawn.getColor() == ColorInfo.BLACK) && (movedPawn.getActualPosition().getRow() == 7));
+		boolean whitePiecePromote = ((movedPawn.getType() == PieceInfo.PAWN) && (movedPawn.getColor() == ColorInfo.WHITE) && (movedPawn.getActualPosition().getRow() == 0));
+		System.out.println(blackPiecePromote + " " + whitePiecePromote);
+		return (blackPiecePromote || whitePiecePromote);
+	}
+	
 	public static void initializePieceMovements() {
 		/* Determines the rules of piece movements, each list of a piece is a direction */
 		validMoves = new ArrayList<Coordinates>();

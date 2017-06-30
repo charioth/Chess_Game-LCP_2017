@@ -27,7 +27,6 @@ public class MenuState extends State {
 	public MenuState(Game game) {
 		super(game);
 		savedGames = new ArrayList<>();
-		simulateLoad();
 		initUIButton();
 	}
 

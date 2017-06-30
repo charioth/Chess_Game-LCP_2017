@@ -71,7 +71,7 @@ public class UIScrollScreen {
 
 
 	public void sMouseScroll(MouseWheelEvent mouse) {
-		int rotation = mouse.getWheelRotation();
+		int rotation = -mouse.getWheelRotation();
 		if(onScreen)
 		{
 			if(buttons.size() > 0)

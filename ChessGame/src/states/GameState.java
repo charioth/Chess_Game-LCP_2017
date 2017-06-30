@@ -3,6 +3,9 @@ package states;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.nio.file.ProviderNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
 import game.ColorInfo;
 import game.Game;
@@ -31,14 +34,18 @@ public class GameState extends State {
 	private boolean subMenu; //if true it show on the screen the exit menu (open with ESC key)
 	private boolean drawOption; // if the person select the draw option active to change the buttons
 	private boolean endGame; // Used to render the image
+	private boolean promoteMenu;
 	// Depending of the ending this image change (possible screens white victory, black victory and draw messages)
 	private BufferedImage winnerMessage;
+	private List<Rectangle> promotionChoices;
 
 	public GameState(Game game) {
 		super(game);
 		newGame();
 		BoardMoviments.initializePieceMovements(); // Pieces movement rules
-		initUIButton();
+		initPromotionSquares();
+		initSubMenuButtons();
+		initDrawMenuButtons();
 	}
 
 	@Override
@@ -56,6 +63,25 @@ public class GameState extends State {
 			loadGame(); // load the game
 		}
 		
+		if(promoteMenu)
+		{
+			if (game.getMouse().isLeftButtonPressed()) { //Wait left mouse button click
+				int counter = 1;
+				for(Rectangle position : promotionChoices)
+				{
+					if(position.contains(game.getMouse().getMouseX(), game.getMouse().getMouseY()))
+					{
+						BoardMoviments.selectedPiece.setType(PieceInfo.values()[counter]);
+						BoardMoviments.selectedPiece = null;
+						actualTurn = actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE; // Change turn
+						promoteMenu = false;
+					}
+					counter++;
+				}
+			}
+			return;
+		}
+		
 		if (endGame) { //If endGame is true than it waits util left mouse button is clicked to change back to menu state
 			if (game.getMouse().isLeftButtonPressed()) { //Wait left mouse button click
 				game.getMouse().setLeftButtonPressed(false);
@@ -69,7 +95,13 @@ public class GameState extends State {
 				BoardMoviments.selectPiece(game.getMouse(), pieceBox, board, actualTurn); //executes the function that select a piece
 			else if (BoardMoviments.isValidMove(game.getMouse())) { // if there is a piece selected then wait until the player click on a valid position
 				BoardMoviments.movePiece(game.getMouse(), BoardMoviments.selectedPiece, board, pieceBox, actualTurn);
-				actualTurn = actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE; // Change turn
+				if(!(promoteMenu = BoardMoviments.promotePawn(BoardMoviments.selectedPiece))) { // if promote not true than chance turn
+					System.out.println(promoteMenu);
+					// Deselect piece
+					System.out.println("Hello");
+					BoardMoviments.selectedPiece = null;
+					actualTurn = actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE; // Change turn
+				}
 			}
 		} 
 	}
@@ -85,6 +117,11 @@ public class GameState extends State {
 		}
 		renderPieces(graph); // Draw all the pieces
 
+		if(promoteMenu)
+		{
+			renderPromoteChoices(graph);
+		}
+		
 		if (subMenu)
 			renderSubMenu(graph); // Draw the subMenu if esc key was pressed
 
@@ -94,6 +131,23 @@ public class GameState extends State {
 		}
 	}
 
+	private void renderPromoteChoices(Graphics graph){
+		int i  = 1;
+		for(Rectangle position : promotionChoices)
+		{
+			graph.drawImage(Assets.promote_square, (int)position.getX(), (int)position.getY(), (int)position.getWidth(), (int)position.getHeight(), null);
+			if(actualTurn == ColorInfo.WHITE)
+			{				
+				graph.drawImage(Assets.whitePiece[i], (int)position.getX(), (int)position.getY(), (int)position.getWidth(), (int)position.getHeight(), null);
+			}
+			else
+			{
+				graph.drawImage(Assets.blackPiece[i], (int)position.getX(), (int)position.getY(), (int)position.getWidth(), (int)position.getHeight(), null);
+			}
+			i++;
+		}
+	}
+	
 	private void renderHighlightPath(Graphics graph) {
 		/*Method that highlight valid, attack and selected positions*/
 		
@@ -160,11 +214,14 @@ public class GameState extends State {
 	@Override
 	public UIList getUIButtons() {
 		/*Control what button should be executed*/
-		if (!drawOption) {
-			return subMenuButtons; // Quit, Draw and save button
-		} else {
-			return drawButtons; // Yes and No buttons
-		}
+		if(drawOption)
+		{
+			return drawButtons;
+		} else if(subMenu)
+		{
+			return subMenuButtons;
+		} 
+		return null;
 	}
 
 	private int move(int line) {
@@ -172,14 +229,62 @@ public class GameState extends State {
 		return Assets.getEdge() + (line * Assets.getMoveDistance());
 	}
 
-	private void initUIButton() {
+	private void initPromotionSquares()
+	{
+		int step = game.width/4;
+		promotionChoices = new ArrayList<>();
+		
+		for(int i = step - (int)(190 * game.scale) ; i < game.width ; i += step)
+		{
+			promotionChoices.add(new Rectangle(i, (int)(game.height/2) - (Assets.getPieceSize()/2), Assets.getSquareSize(), Assets.getSquareSize()));
+		}
+	}
+	
+	private void initDrawMenuButtons()
+	{
+		drawButtons = new UIList();
+
+		float buttonWidth = Assets.buttonYes[0].getWidth() * game.scale;
+		float buttonHeight = Assets.buttonYes[0].getHeight() * game.scale;
+
+		/*Add to the draw button list the yes button, this button is used to accept the draw proposal when draw option was selected
+		 * if active the end game, close the subMenu and set the winnerMessage to a draw message*/
+		drawButtons.getButtons()
+				.add(new UIButton((int) (((game.width / 2) - 155) * game.scale), (int) ((670 * game.scale)),
+						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonYes, -1, new ButtonAction() {
+							public void action() { //If this button was selected
+									endGame = true; //Set the game to end
+									subMenu = false; // Set the menu to close
+									winnerMessage = Assets.draw; // Set ending message to a draw
+									drawOption = false; //Set draw option to close
+									game.getKeyboard().mESC = false; //Set ESC key to not pressed
+							}
+
+						}));
+
+		buttonWidth = Assets.buttonNo[0].getWidth() * game.scale;
+		buttonHeight = Assets.buttonNo[0].getHeight() * game.scale;
+
+		/*Add to the draw button list the no button, this button is used negate the draw proposal when draw option was selected
+		 * if clicked the no button closes the draw message and the menu and go back to the game*/
+		drawButtons.getButtons()
+				.add(new UIButton((int) (((game.width / 2) + 230) * game.scale), (int) ((670 * game.scale)),
+						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonNo, -1, new ButtonAction() {
+							public void action() { //If this button was selected
+									drawOption = false; //Set draw option to close
+									subMenu = false;  // Set the menu to close
+									game.getKeyboard().mESC = false; //Set ESC key to not pressed
+							}
+						}));
+
+	}
+	
+	private void initSubMenuButtons() {
 		/*Method that initialize all buttons used on the game state*/
 		float buttonWidth = Assets.buttonQuit[0].getWidth() * game.scale;
 		float buttonHeight = Assets.buttonQuit[0].getHeight() * game.scale;
 
 		subMenuButtons = new UIList();
-		drawButtons = new UIList();
-
 		/*Add to the subMenu list the Quit button, this button is used to give up and quit the game screen
 		 * for every button a Button action is defined when passing the argument, this way is possible to program the button when creating it*/
 		subMenuButtons.getButtons().add(new UIButton((int) (150 * game.scale), (int) ((550 * game.scale)),
@@ -213,11 +318,9 @@ public class GameState extends State {
 							public void action() { //If this button was selected
 								/*Save button action implements*/
 								System.out.println("Save a game name");
-								//If exitMenu is true it means that ESC key was pressed than it can active this action if pressed on button
-								if (subMenu) {
-									subMenu = false;
-									game.getKeyboard().mESC = false; //Set ESC key to not pressed
-								}
+								subMenu = false;
+								game.getKeyboard().mESC = false; //Set ESC key to not pressed
+								
 							}
 
 						}));
@@ -229,10 +332,8 @@ public class GameState extends State {
 		subMenuButtons.getButtons().add(new UIButton((int) (740 * game.scale), (int) ((550 * game.scale)),
 				(int) (buttonWidth), (int) (buttonHeight), Assets.buttonDraw, -1, new ButtonAction() {
 							public void action() { //If this button was selected
-								if (subMenu) { //If submenu was clicked then active this button
-									drawOption = true; //Active draw msg and change what buttons will be active (Yes and No will active)
-									game.getKeyboard().mESC = false;  //Set ESC key to not pressed
-								}
+								drawOption = true; //Active draw msg and change what buttons will be active (Yes and No will active)
+								game.getKeyboard().mESC = false;  //Set ESC key to not pressed
 							}
 		
 						}));
@@ -245,49 +346,10 @@ public class GameState extends State {
 				.add(new UIButton((int) ((game.width / 2) - (buttonWidth / 2)), (int) ((670 * game.scale)),
 						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonContinue, -1, new ButtonAction() {
 							public void action() { //If this button was selected
-								if (subMenu) { //If submenu was clicked then active this button
-									subMenu = false; //Close the submenu
-									game.getKeyboard().mESC = false; //Set ESC key to not pressed
-								}
+								subMenu = false; //Close the submenu
+								game.getKeyboard().mESC = false; //Set ESC key to not pressed
 							}
 
-						}));
-
-		buttonWidth = Assets.buttonYes[0].getWidth() * game.scale;
-		buttonHeight = Assets.buttonYes[0].getHeight() * game.scale;
-
-		/*Add to the draw button list the yes button, this button is used to accept the draw proposal when draw option was selected
-		 * if active the end game, close the subMenu and set the winnerMessage to a draw message*/
-		drawButtons.getButtons()
-				.add(new UIButton((int) (((game.width / 2) - 155) * game.scale), (int) ((670 * game.scale)),
-						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonYes, -1, new ButtonAction() {
-							public void action() { //If this button was selected
-								if (subMenu) { //If submenu was clicked then active this button
-									endGame = true; //Set the game to end
-									subMenu = false; // Set the menu to close
-									winnerMessage = Assets.draw; // Set ending message to a draw
-									drawOption = false; //Set draw option to close
-									game.getKeyboard().mESC = false; //Set ESC key to not pressed
-								}
-							}
-
-						}));
-
-		buttonWidth = Assets.buttonNo[0].getWidth() * game.scale;
-		buttonHeight = Assets.buttonNo[0].getHeight() * game.scale;
-
-		/*Add to the draw button list the no button, this button is used negate the draw proposal when draw option was selected
-		 * if clicked the no button closes the draw message and the menu and go back to the game*/
-		drawButtons.getButtons()
-				.add(new UIButton((int) (((game.width / 2) + 230) * game.scale), (int) ((670 * game.scale)),
-						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonNo, -1, new ButtonAction() {
-							public void action() { //If this button was selected
-								if (subMenu) { //If submenu was clicked then active this button
-									drawOption = false; //Set draw option to close
-									subMenu = false;  // Set the menu to close
-									game.getKeyboard().mESC = false; //Set ESC key to not pressed
-								}
-							}
 						}));
 	}
 
