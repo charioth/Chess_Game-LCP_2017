@@ -51,10 +51,8 @@ public class GameState extends State {
 		/*tick method that runs 60 times per second*/
 		
 		if (State.newGame) { //If newGame boolean attribute is set true than it means that on the menu state, the new game button was pressed
-			State.newGame = false;
 			newGame(); //initialize a new game table (all piece position at the start condition)
 		} else if (State.loadGame) { //if the loadGame was set than on the menu state the load button was pressed, so load the game that was been played
-			State.loadGame = false;
 			loadGame(); // load the game
 		}
 		
@@ -185,7 +183,7 @@ public class GameState extends State {
 		/*Add to the subMenu list the Quit button, this button is used to give up and quit the game screen
 		 * for every button a Button action is defined when passing the argument, this way is possible to program the button when creating it*/
 		subMenuButtons.getButtons().add(new UIButton((int) (150 * game.scale), (int) ((550 * game.scale)),
-						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonQuit, new ButtonAction() {
+						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonQuit, -1, new ButtonAction() {
 							public void action() { //If this button was selected
 								/*Quit button action implements*/
 								//If exitMenu is true it means that ESC key was pressed than it can active this action if pressed on button
@@ -211,15 +209,14 @@ public class GameState extends State {
 
 		/*Add to the subMenu list the Save button, this button is used to save the game and go back to the menu state*/
 		subMenuButtons.getButtons().add(new UIButton((int) ((game.width / 2) - (buttonWidth / 2)), (int) ((550 * game.scale)),
-						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonSave, new ButtonAction() {
+						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonSave, -1, new ButtonAction() {
 							public void action() { //If this button was selected
 								/*Save button action implements*/
-								// ADICIONAR O SAVE AQUI
+								System.out.println("Save a game name");
 								//If exitMenu is true it means that ESC key was pressed than it can active this action if pressed on button
 								if (subMenu) {
 									subMenu = false;
 									game.getKeyboard().mESC = false; //Set ESC key to not pressed
-									State.setCurrentState(game.getMenuState()); //Change to menu state
 								}
 							}
 
@@ -230,7 +227,7 @@ public class GameState extends State {
 		
 		/*Add to the subMenu list the Draw button, this button is used to propose a draw game. When selected it change the buttons on the screen*/
 		subMenuButtons.getButtons().add(new UIButton((int) (740 * game.scale), (int) ((550 * game.scale)),
-				(int) (buttonWidth), (int) (buttonHeight), Assets.buttonDraw, new ButtonAction() {
+				(int) (buttonWidth), (int) (buttonHeight), Assets.buttonDraw, -1, new ButtonAction() {
 							public void action() { //If this button was selected
 								if (subMenu) { //If submenu was clicked then active this button
 									drawOption = true; //Active draw msg and change what buttons will be active (Yes and No will active)
@@ -246,7 +243,7 @@ public class GameState extends State {
 		/*Add to the subMenu list the continue button, this button is used to close the subMenu and go back to the game*/
 		subMenuButtons.getButtons()
 				.add(new UIButton((int) ((game.width / 2) - (buttonWidth / 2)), (int) ((670 * game.scale)),
-						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonContinue, new ButtonAction() {
+						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonContinue, -1, new ButtonAction() {
 							public void action() { //If this button was selected
 								if (subMenu) { //If submenu was clicked then active this button
 									subMenu = false; //Close the submenu
@@ -263,7 +260,7 @@ public class GameState extends State {
 		 * if active the end game, close the subMenu and set the winnerMessage to a draw message*/
 		drawButtons.getButtons()
 				.add(new UIButton((int) (((game.width / 2) - 155) * game.scale), (int) ((670 * game.scale)),
-						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonYes, new ButtonAction() {
+						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonYes, -1, new ButtonAction() {
 							public void action() { //If this button was selected
 								if (subMenu) { //If submenu was clicked then active this button
 									endGame = true; //Set the game to end
@@ -283,7 +280,7 @@ public class GameState extends State {
 		 * if clicked the no button closes the draw message and the menu and go back to the game*/
 		drawButtons.getButtons()
 				.add(new UIButton((int) (((game.width / 2) + 230) * game.scale), (int) ((670 * game.scale)),
-						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonNo, new ButtonAction() {
+						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonNo, -1, new ButtonAction() {
 							public void action() { //If this button was selected
 								if (subMenu) { //If submenu was clicked then active this button
 									drawOption = false; //Set draw option to close
@@ -296,6 +293,7 @@ public class GameState extends State {
 
 	private void newGame() {
 		/*Method that initialize all pieces at default position*/
+		State.newGame = false;
 		actualTurn = ColorInfo.WHITE;
 		pieceBox[0] = new PieceList(ColorInfo.WHITE);
 		pieceBox[1] = new PieceList(ColorInfo.BLACK);
@@ -303,7 +301,12 @@ public class GameState extends State {
 	}
 
 	private void loadGame() {
-
+		//Chamar a função que busca por nome
+		System.out.println(State.lastButtonIndex);
+		System.out.println("SEARCH FOR SAVED GAME NAME: " + State.savedGames.get(State.lastButtonIndex));
+		State.savedGames.clear();
+		State.loadGame = false;
+		initBoard();
 	}
 
 	private void initBoard() {

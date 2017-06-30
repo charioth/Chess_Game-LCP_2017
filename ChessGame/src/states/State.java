@@ -11,13 +11,18 @@ public abstract class State {
 	/*Super class that every state of the game extends
 	 * it controls the current state using a static variable and control when execute the newGame and loadGame*/
 	private static State currentState = null;
+	public static int lastButtonIndex;
+	//MenuState to gameState signals
 	protected static boolean newGame;
 	protected static boolean loadGame;
-	protected static ArrayList<String> savedGames = new ArrayList<>();;
+	protected static ArrayList<String> savedGames;
+	
 	protected Game game;
 
 	State(Game game) {
 		this.game = game;
+		savedGames = new ArrayList<>();
+		lastButtonIndex = 0;
 	}
 
 	public static void setCurrentState(State state) {
