@@ -3,7 +3,6 @@ package pieces;
 import java.util.List;
 
 import game.ColorInfo;
-import game.BoardMoviments;
 import game.Coordinates;
 import game.Square;
 

@@ -5,12 +5,15 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
+import states.State;
+
 public class UIButton {
 	/*Button class it has a position on the screen, a size (width and height)
 	 * a onButton attribute to control when the mouse is on the button
 	 * a bufferedImage vector to hold the 2 images of the button
 	 * a Rectangle to test if the mouse position is on bound with the button area
 	 * and last the buttonAction that tell what the button should execute when clicked*/
+	private int index;
 	private int x, y, width, height;
 	private boolean onButton;
 	private BufferedImage button[];
@@ -19,7 +22,7 @@ public class UIButton {
 	private Text text;
 	
 	//Passing the ButtonAction as parameter is possible to program the button when creating it
-	public UIButton(int x, int y, int width, int height, BufferedImage button[], ButtonAction click) {
+	public UIButton(int x, int y, int width, int height, BufferedImage button[], int index, ButtonAction click) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -29,9 +32,10 @@ public class UIButton {
 		bound = new Rectangle(x, y, width, height);
 		this.click = click;
 		this.text = null;
+		this.index = index;
 	}
 	
-	public UIButton(int x, int y, int width, int height, BufferedImage button[], Text text,ButtonAction click) {
+	public UIButton(int x, int y, int width, int height, BufferedImage button[], int index, Text text, ButtonAction click) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -41,6 +45,7 @@ public class UIButton {
 		bound = new Rectangle(x, y, width, height);
 		this.click = click;
 		this.text = text;
+		this.index = index;
 	}
 
 	public void render(Graphics graph) {
@@ -74,6 +79,10 @@ public class UIButton {
 	public void bMouseRelease() {
 		//If the mouse is on button than call the action method that execute the action
 		if (onButton) {
+			if(index >= 0)
+			{
+				State.lastButtonIndex = index;
+			}
 			onButton = false;
 			click.action();
 		}
@@ -132,5 +141,13 @@ public class UIButton {
 
 	public void setBound(Rectangle bound) {
 		this.bound = bound;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
 	}
 }
