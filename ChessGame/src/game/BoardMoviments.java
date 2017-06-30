@@ -33,15 +33,12 @@ public class BoardMoviments {
 				int pieceID = board[row][column].getPieceID();
 
 				if ((pieceID >= 0) && (board[row][column].getColor() == turn)) {
-					/*
-					 * Check if there is a piece in the square and if it belongs
-					 * to the current turn player
-					 */
+					/* Check if there is a piece in the square and if it belongs to the current turn player */
 
 					// Select the piece
 					selectedPiece = pieceBox[turn.value].getPieces()[pieceID];
 
-					// Highlight the possible movements of the piece
+					// Generate the possible movements of the piece
 					selectedPiece.move(validMoves, validAttack, board,
 							possiblePiecesMovements.get(selectedPiece.getType()));
 
@@ -55,8 +52,6 @@ public class BoardMoviments {
 	}
 
 	public static boolean isValidMove(final MouseManager mouse) {
-		/* Validates the chosen movement */
-		boolean isValid = false;
 
 		if (mouse.isLeftButtonPressed()) {
 
@@ -64,23 +59,14 @@ public class BoardMoviments {
 			int row = (mouse.getMouseY() - Assets.getEdge()) / Assets.getMoveDistance();
 			int column = (mouse.getMouseX() - Assets.getEdge()) / Assets.getMoveDistance();
 
-			// Search the validAttack list for the chosen movement
-			if (validAttack.contains(point(row, column))) {
-				isValid = true;
-			}
-			
-			// Search the validMoves list for the chosen movement
-			if (validMoves.contains(point(row, column))) {
-				isValid = true;
-			}
-			
-			// If the movement is valid clear the lists
-			if (isValid) {
+			// Search the validAttack and validMoves list for the chosen movement
+			if (validAttack.contains(point(row, column)) || validMoves.contains(point(row, column))) {
 				validMoves.clear();
 				validAttack.clear();
+				return true;
 			}
 		}
-		return isValid;
+		return false;
 	}
 
 	public static void movePiece(MouseManager mouse, Piece piece, Square board[][], PieceList[] pieceBox, ColorInfo turn) {
@@ -110,10 +96,32 @@ public class BoardMoviments {
 		// Deselect piece
 		selectedPiece = null;
 	}
-
-	public static boolean isChecked(final Square board[][]) {
+	
+	private static boolean checkKing(Piece piece, final Square board[][], PieceList enemyPieces) {
+		List<Coordinates> moves = new ArrayList<Coordinates>();
+		List<Coordinates> attacks = new ArrayList<Coordinates>();
 		
-		return true; // check method
+		piece.move(moves, attacks, board, possiblePiecesMovements.get(piece.getType()));
+		
+		for(Coordinates underAttack : attacks) {
+			if(enemyPieces.getPieces()
+					[board[underAttack.getRow()][underAttack.getColumn()].getPieceID()]
+							.getType() == PieceInfo.KING) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public static boolean isChecked(final Square board[][], ColorInfo turn, PieceList[] pieceBox) {
+		int enemyTurn = (turn.value == ColorInfo.WHITE.value ? ColorInfo.BLACK.value : ColorInfo.WHITE.value);
+		
+		for(Piece testCheck : pieceBox[turn.value].getPieces()) {
+			if(testCheck.getType() == PieceInfo.DEAD) continue;
+			if(checkKing(testCheck, board, pieceBox[enemyTurn])) return true;
+		}
+		return false; // check method
 	}
 
 	public static boolean isCheckmated(final Square board[][]) {
