@@ -5,6 +5,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+import DAO.DeleteGame;
+import DAO.LoadGame;
 import game.Game;
 import graphics.ButtonAction;
 import graphics.Text;
@@ -26,8 +28,12 @@ public class MenuState extends State {
 
 	public MenuState(Game game) {
 		super(game);
-		savedGames = new ArrayList<>();
-		initUIButton();
+		savedGames = new ArrayList<String>();
+		try {
+			initUIButton();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void simulateLoad() {
@@ -131,15 +137,19 @@ public class MenuState extends State {
 
 					@Override
 					public void action() {
-						State.savedGames.clear();
-						System.out.println("DELETE GAME");
+						//System.out.println("DELETE GAME");
 						// CHAMAR METODO QUE APAGA UM SAVE DO BANCO
+						try {
+							DeleteGame.Delete(State.savedGames.get(lastButtonIndex));
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 						gameSelected = false;
 					}
 				}));
 	}
 
-	private void initUIButton() {
+	private void initUIButton() throws Exception{
 		// Resize the button depending of the scale attribute of the game class
 		float buttonWidth = Assets.buttonLoadGame[0].getWidth() * game.scale;
 		float buttonHeight = Assets.buttonLoadGame[0].getHeight() * game.scale;
@@ -160,7 +170,11 @@ public class MenuState extends State {
 						(int) (game.scale * buttonHeight), Assets.buttonLoadGame, -1, new ButtonAction() {
 							public void action() {
 								System.out.println("LOAD ALL NAMES");
-								simulateLoad();
+								try {
+									savedGames = LoadGame.loadNames();
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
 								initLoadScreen();
 								loadMenu = true;
 							}

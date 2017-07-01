@@ -2,7 +2,6 @@ package DAO;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 
 import game.ColorInfo;
 import game.Coordinates;
@@ -18,18 +17,19 @@ public class LoadGame {
 
 	}
 
-	public static void loadGame(String gameName, PieceList pieceBox[], ColorInfo actualTurn) throws Exception {
+	public static ColorInfo loadGame(String gameName, PieceList pieceBox[]) throws Exception {
 		connection = DatabaseConnection.newConnection(); //Connect to database
 		Statement stmt = connection.createStatement(); //Creates a Statement object for sending SQL statements to the database
-
+		int i = 0;
 		try {
 			/*Load whose turn it is*/
-			String sql  = "SELECT turn FROM save_game WHERE game_name = '" + gameName + "'" ;
+			String sql  = "SELECT turn FROM save_game WHERE name = '" + gameName + "'";
 			ResultSet rs = stmt.executeQuery(sql);
-			actualTurn = ColorInfo.values()[rs.getInt("turn")];
+			rs.next();
+			i = rs.getInt("turn");
 			
 			/*Load all pieces*/
-			sql = "SELECT * FROM piece WHERE game_name = '" + gameName + "'" ;
+			sql = "SELECT * FROM piece WHERE game_name = '" + gameName + "'";
 			rs = stmt.executeQuery(sql);
 			
 			/*Initialize the piecebox with each piece information*/
@@ -40,11 +40,12 @@ public class LoadGame {
 				int piece_type = rs.getInt("piece_type");
 				boolean moved = rs.getBoolean("moved");
 				int piece_color = rs.getInt("piece_color");
-				int index = rs.getInt("index");
-				
+				int index = rs.getInt("piece_index");
 				pieceBox[piece_color].getPieces()[index] = new Piece(new Coordinates(coord_row, coord_column),
 																PieceInfo.values()[piece_type], moved, ColorInfo.values()[piece_color]);
+				pieceBox[piece_color].getPieces()[index].setIndex(index);
 			}
+			
 			rs.close();
 			
 		} catch (Exception e) {
@@ -67,12 +68,14 @@ public class LoadGame {
 				throw new RuntimeException(e);
 			}
 		}
+		return ColorInfo.values()[i];
 	}
 	
-	public static List<String> loadNames() throws Exception{
+	public static ArrayList<String> loadNames() throws Exception{
 		
-		List<String> games = new ArrayList<String>();
+		ArrayList<String> games = new ArrayList<String>();
 		
+		System.out.println("Connect LOAD ALL: ");
 		connection = DatabaseConnection.newConnection(); //Connect to database
 
 		Statement stmt = connection.createStatement(); //Creates a Statement object for sending SQL statements to the database
@@ -83,8 +86,8 @@ public class LoadGame {
 			ResultSet rs = stmt.executeQuery(sql);
 			
 			/*Add to the list all saved game names and dates*/
-			while(rs.next()){
-				games.add(rs.getString("name") + "	" + rs.getString("save_date"));
+			while(rs.next()) {
+				games.add(rs.getString("name"));// + "	" + rs.getString("save_date"));
 			}
 			rs.close();
 			

@@ -3,10 +3,11 @@ package states;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.nio.file.ProviderNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+import DAO.LoadGame;
+import DAO.SaveGame;
 import game.ColorInfo;
 import game.Game;
 import game.BoardMoviments;
@@ -60,7 +61,7 @@ public class GameState extends State {
 		if (State.newGame) { //If newGame boolean attribute is set true than it means that on the menu state, the new game button was pressed
 			newGame(); //initialize a new game table (all piece position at the start condition)
 		} else if (State.loadGame) { //if the loadGame was set than on the menu state the load button was pressed, so load the game that was been played
-			loadGame(); // load the game
+			loadGame(State.savedGames.get(lastButtonIndex)); // load the game
 		}
 		
 		if(promoteMenu)
@@ -97,9 +98,7 @@ public class GameState extends State {
 				BoardMoviments.movePiece(game.getMouse(), BoardMoviments.selectedPiece, board, pieceBox, actualTurn);
 				if(!(promoteMenu = BoardMoviments.promotePawn(BoardMoviments.selectedPiece))) { // if promote not true than chance turn
 					System.out.println(promoteMenu);
-					// Deselect piece
-					System.out.println("Hello");
-					BoardMoviments.selectedPiece = null;
+					BoardMoviments.selectedPiece = null; //Deselect piece
 					actualTurn = actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE; // Change turn
 				}
 			}
@@ -317,7 +316,12 @@ public class GameState extends State {
 						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonSave, -1, new ButtonAction() {
 							public void action() { //If this button was selected
 								/*Save button action implements*/
-								System.out.println("Save a game name");
+								//System.out.println("Save a game name");
+								try {
+									SaveGame.save(actualTurn.value, pieceBox);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
 								subMenu = false;
 								game.getKeyboard().mESC = false; //Set ESC key to not pressed
 								
@@ -362,10 +366,17 @@ public class GameState extends State {
 		initBoard();
 	}
 
-	private void loadGame() {
-		//Chamar a função que busca por nome
-		System.out.println(State.lastButtonIndex);
-		System.out.println("SEARCH FOR SAVED GAME NAME: " + State.savedGames.get(State.lastButtonIndex));
+	private void loadGame(String gameName) {
+		//Chamar a funï¿½ï¿½o que busca por nome
+		//System.out.println(State.lastButtonIndex);
+		//System.out.println("SEARCH FOR SAVED GAME NAME: " + State.savedGames.get(State.lastButtonIndex));
+		try {
+			System.out.println("Load game: ");
+			actualTurn = LoadGame.loadGame(gameName, pieceBox);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		State.savedGames.clear();
 		State.loadGame = false;
 		initBoard();

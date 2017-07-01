@@ -23,9 +23,9 @@ public class SaveGame {
 		Date date = new Date();
 		try {
 			//Automatically created name
-			gameName = "SaveGame" + String.format("%T ", date); //Time formatted for the 24-hour clock as "%tH:%tM:%tS"
-			
-			saveGame(gameName, actualTurn, String.format("%D", date), stmt); //Date formatted as "%tm/%td/%ty"
+			gameName = "SaveGame" + String.format("%tH:%tM:%tS ", date, date, date); //Time formatted for the 24-hour clock as "%tH:%tM:%tS"
+			System.out.println(String.format("%tm/%td/%ty", date, date, date));
+			saveGame(gameName, actualTurn, String.format("%tm/%td/%ty", date, date, date), stmt); //Date formatted as "%tm/%td/%ty"
 			savePieces(gameName, pieceBox, stmt); //Save the pieces information
 
 		} catch (Exception e) {
@@ -54,7 +54,7 @@ public class SaveGame {
 	public static void saveGame(String gameName, int actualTurn, String saveDate, Statement stmt) throws Exception {
 	/*Save the game information in the database*/
 		try {
-			String sql = "INSERT INTO save_game(name, save_date, turn) VALUES (" + gameName + ", " + saveDate + ", "
+			String sql = "INSERT INTO save_game(name, save_date, turn) VALUES ('" + gameName + "'" + ", " + "'" + saveDate + "'" + ", "
 					+ actualTurn + ");";
 			stmt.executeUpdate(sql);
 
@@ -84,10 +84,10 @@ public class SaveGame {
 					piece_color = pieces.getPieces()[i].getColor().value;
 					index = pieces.getPieces()[i].getIndex();
 					
-					String sql = "INSERT INTO piece (game_name, coord_row, coord_column, piece_type, moved, piece_color, index2)"
-							+ " VALUES (" + gameName + ", " + coord_row + ", " + coord_column + ", " + piece_type + ", "
+					String sql = "INSERT INTO piece (game_name, coord_row, coord_column, piece_type, moved, piece_color, piece_index)"
+							+ " VALUES ('" + gameName + "'" + ", " + coord_row + ", " + coord_column + ", " + piece_type + ", "
 							+ moved + ", " + piece_color + ", " + index + ");";
-
+					//System.out.println("sql string: " + sql);
 					stmt.executeUpdate(sql); //Save each piece in the database
 				}
 			}

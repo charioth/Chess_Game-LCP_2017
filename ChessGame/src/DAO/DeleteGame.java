@@ -18,11 +18,11 @@ public class DeleteGame {
 
 		try {
 			/* Delete the pieces from the game*/
-			String sql = " DELETE * FROM piece WHERE gameName = '" + gameName + "'";
+			String sql = " DELETE FROM piece WHERE game_name = '" + gameName + "'";
 			stmt.executeUpdate(sql);
 			
 			/* Detele the game*/
-			sql = " DELETE * FROM save_game WHERE name = " + gameName + "'";
+			sql = " DELETE FROM save_game WHERE name = '" + gameName + "'";
 			stmt.executeUpdate(sql);
 			
 		} catch (Exception e) {

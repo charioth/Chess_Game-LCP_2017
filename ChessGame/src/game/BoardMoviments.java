@@ -129,7 +129,6 @@ public class BoardMoviments {
 	{
 		boolean blackPiecePromote = ((movedPawn.getType() == PieceInfo.PAWN) && (movedPawn.getColor() == ColorInfo.BLACK) && (movedPawn.getActualPosition().getRow() == 7));
 		boolean whitePiecePromote = ((movedPawn.getType() == PieceInfo.PAWN) && (movedPawn.getColor() == ColorInfo.WHITE) && (movedPawn.getActualPosition().getRow() == 0));
-		System.out.println(blackPiecePromote + " " + whitePiecePromote);
 		return (blackPiecePromote || whitePiecePromote);
 	}
 	
