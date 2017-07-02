@@ -18,8 +18,9 @@ public class Game implements Runnable {
 	// Screen Attributes
 	private String name;
 	private int screen_size = 1052;
-	public int width, height;
-	public float scale;
+	private int width, height;
+	private float scale;
+
 	private Display display;
 	private BufferStrategy bs;
 	private Graphics graph;
@@ -179,5 +180,17 @@ public class Game implements Runnable {
 
 	public void setRunning(boolean exit) {
 		running = exit;
+	}
+	
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public float getScale() {
+		return scale;
 	}
 }

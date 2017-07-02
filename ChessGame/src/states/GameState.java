@@ -17,38 +17,55 @@ import graphics.ButtonAction;
 import graphics.UIButton;
 import graphics.UIList;
 import graphics.UIScrollScreen;
+import loader.ImageLoader;
 import pieces.PieceInfo;
 import pieces.PieceList;
-import tempassets.Assets;
 
 public class GameState extends State {
 	/* Game screen state it is the game screen where all the movements and action occurs*/
 	
 	//Game logic
 	private ColorInfo actualTurn; //Turn of the actual player, since there is only two color than a color is what is need to control the turn
-	private Square[][] board = new Square[8][8]; // Table of the game
-	private PieceList pieceBox[] = new PieceList[2]; //PieceBox has the a array list with all the white pieces and other with the black pieces
+	private Square[][] board;
+	private PieceList pieceBox[];
 	
 	//Screen control
-	private UIList subMenuButtons;
-	private UIList drawButtons;
+	private UIList subMenuButtons; //SubMenu buttons Quit,Save,Draw and Continue
+	private UIList drawButtons; // Yes or No
 	private boolean subMenu; //if true it show on the screen the exit menu (open with ESC key)
 	private boolean drawOption; // if the person select the draw option active to change the buttons
+	private boolean releaseMenu;
+	
 	private boolean endGame; // Used to render the image
-	private boolean promoteMenu;
-	// Depending of the ending this image change (possible screens white victory, black victory and draw messages)
-	private BufferedImage winnerMessage;
+	private boolean checkmated; //Tell that the game to set winner message
+	
+	private boolean promoteMenu; //When a pawn get to the end of  the table
+	
+	private BufferedImage winnerMessage;// Depending of the ending this image change (possible screens white victory, black victory and draw messages)
+	private BufferedImage background; // Board background
+	private BufferedImage renderPieceBox[][]; // Matrix 2x6 used to render the pieces
+	
+	// Promotion render info
 	private List<Rectangle> promotionChoices;
-
+	private BufferedImage promoteSquare;
+		
+	public BufferedImage gameLogo; //SubMenu logo
+	private BufferedImage acceptDraw;
+	private int logoWidth;
+	private int logoHeight;
+	
+	private BufferedImage moveSquare;
+	private BufferedImage attackSquare;
+	private BufferedImage selectSquare;
+	private int squareSize;
+	private int moveDistance; // Used to init board rectangle x,y
+	private int edge; // Used to init board rectangle x,y
+	
+	
 	public GameState(Game game) {
 		super(game);
-		newGame();
-		BoardMoviments.initializePieceMovements(); // Pieces movement rules
-		initPromotionSquares();
-		initSubMenuButtons();
-		initDrawMenuButtons();
 	}
-
+	//("/button/draw_request_w.png"));
 	@Override
 	public UIScrollScreen getScreen() {
 		return null;
@@ -64,18 +81,19 @@ public class GameState extends State {
 			loadGame(State.savedGames.get(lastButtonIndex)); // load the game
 		}
 		
-		if(promoteMenu)
-		{
+		if(promoteMenu) { // If promote occured
 			if (game.getMouse().isLeftButtonPressed()) { //Wait left mouse button click
 				int counter = 1;
-				for(Rectangle position : promotionChoices)
-				{
-					if(position.contains(game.getMouse().getMouseX(), game.getMouse().getMouseY()))
-					{
+				for(Rectangle position : promotionChoices) {
+					if(position.contains(game.getMouse().getMouseX(), game.getMouse().getMouseY())) {
 						BoardMoviments.selectedPiece.setType(PieceInfo.values()[counter]);
 						BoardMoviments.selectedPiece = null;
 						actualTurn = actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE; // Change turn
+						promotionChoices.clear(); //Releases memory used to render the promotion
+						promotionChoices = null;
+						promoteSquare = null;
 						promoteMenu = false;
+						break;
 					}
 					counter++;
 				}
@@ -84,65 +102,74 @@ public class GameState extends State {
 		}
 		
 		if (endGame) { //If endGame is true than it waits util left mouse button is clicked to change back to menu state
+			if(checkmated){
+				checkmated = false;
+				if (actualTurn == ColorInfo.WHITE)
+					winnerMessage = ImageLoader.loadImage("/background/congratulations_white.png"); //white piece victory image
+				else
+					winnerMessage = ImageLoader.loadImage("/background/congratulations_black.png"); //black piece victory image
+			}
 			if (game.getMouse().isLeftButtonPressed()) { //Wait left mouse button click
-				game.getMouse().setLeftButtonPressed(false);
-				game.getKeyboard().mESC = false;
-				endGame = false;
+				State.loadMenuState = true;
+				exitGameState();
+				State.loadMenuState = true;
 				State.setCurrentState(game.getMenuState()); //Change state
 			}
 		} else if (!subMenu) { //If submenu is false then the game is been played
-			subMenu = game.getKeyboard().mESC; // If the ESC key was pressed then active the subMenu
-			if (BoardMoviments.selectedPiece == null) // If there is not a piece selected
+			if(subMenu = game.getKeyboard().mESC) {// If the ESC key was pressed then active the subMenu
+				initSubMenuScreen(); //Load SubMenu image and buttons (Quit, Save, Draw and Continue
+			}
+			if (BoardMoviments.selectedPiece == null) {	// If there is not a piece selected
 				BoardMoviments.selectPiece(game.getMouse(), pieceBox, board, actualTurn); //executes the function that select a piece
+			}
 			else if (BoardMoviments.isValidMove(game.getMouse())) { // if there is a piece selected then wait until the player click on a valid position
 				BoardMoviments.movePiece(game.getMouse(), BoardMoviments.selectedPiece, board, pieceBox, actualTurn);
 				if(!(promoteMenu = BoardMoviments.promotePawn(BoardMoviments.selectedPiece))) { // if promote not true than chance turn
-					System.out.println(promoteMenu);
 					BoardMoviments.selectedPiece = null; //Deselect piece
 					actualTurn = actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE; // Change turn
+				} else {
+					initPromotion(); //Initialize promotion rectangles to get the choose piece
 				}
 			}
-		} 
+		} else if (releaseMenu) { //Fre memory if the submenu was closed (because endgame = false and subMenu = true and release = true, it means close submenu screen)
+			releaseMenu = false;
+			subMenu = false;
+			releaseUIButtons();
+		}
 	}
 
 	@Override
 	public void render(Graphics graph) {
+		if(State.loadGame || State.newGame) {
+			return;
+		}
 		/*Method responsible to render the game*/
-		
-		graph.drawImage(Assets.background, 0, 0, game.width, game.height, null); //Draw the background
+		graph.drawImage(background, 0, 0, game.getWidth(), game.getHeight(), null); //Draw the background
 		
 		if (BoardMoviments.selectedPiece != null) { // if there is a piece selected then draw the highlight positions
 			renderHighlightPath(graph);
 		}
 		renderPieces(graph); // Draw all the pieces
 
-		if(promoteMenu)
-		{
+		if(promoteMenu) {
 			renderPromoteChoices(graph);
 		}
 		
-		if (subMenu)
+		if (subMenu) {			
 			renderSubMenu(graph); // Draw the subMenu if esc key was pressed
+		}
 
-		if (endGame) { // Draw the winner msg
-			graph.drawImage(winnerMessage, 0, 0, (int) (winnerMessage.getWidth() * game.scale),
-					(int) (winnerMessage.getHeight() * game.scale), null);
+		if ((endGame && winnerMessage != null)) { // Draw the winner msg
+			graph.drawImage(winnerMessage, 0, 0, (int) (winnerMessage.getWidth() * game.getScale()), (int) (winnerMessage.getHeight() * game.getScale()), null);
 		}
 	}
 
-	private void renderPromoteChoices(Graphics graph){
+	private void renderPromoteChoices(Graphics graph) {
+		/*Show on the screen the promote pieces*/
 		int i  = 1;
-		for(Rectangle position : promotionChoices)
-		{
-			graph.drawImage(Assets.promote_square, (int)position.getX(), (int)position.getY(), (int)position.getWidth(), (int)position.getHeight(), null);
-			if(actualTurn == ColorInfo.WHITE)
-			{				
-				graph.drawImage(Assets.whitePiece[i], (int)position.getX(), (int)position.getY(), (int)position.getWidth(), (int)position.getHeight(), null);
-			}
-			else
-			{
-				graph.drawImage(Assets.blackPiece[i], (int)position.getX(), (int)position.getY(), (int)position.getWidth(), (int)position.getHeight(), null);
-			}
+		for(Rectangle position : promotionChoices) {
+			graph.drawImage(promoteSquare, (int)position.getX(), (int)position.getY(), (int)position.getWidth(), (int)position.getHeight(), null);				
+			graph.drawImage(renderPieceBox[actualTurn.value][i], (int)position.getX(), (int)position.getY(), (int)position.getWidth(), (int)position.getHeight(), null);
 			i++;
 		}
 	}
@@ -155,21 +182,19 @@ public class GameState extends State {
 		int column = BoardMoviments.selectedPiece.getActualPosition().getColumn();
 		
 		//Draw purple square
-		graph.drawImage(Assets.select_square, board[row][column].getRenderSquare().x, board[row][column].getRenderSquare().y,
-				Assets.getSquareSize(), Assets.getSquareSize(), null);
+		graph.drawImage(selectSquare, board[row][column].getRenderSquare().x,
+						board[row][column].getRenderSquare().y, squareSize, squareSize, null);
 
 		//For every valid position draw a blue square on the position
 		for (Coordinates valid : BoardMoviments.validMoves) {
-			graph.drawImage(Assets.move_square, board[valid.getRow()][valid.getColumn()].getRenderSquare().x,
-					board[valid.getRow()][valid.getColumn()].getRenderSquare().y, Assets.getSquareSize(),
-					Assets.getSquareSize(), null);
+			graph.drawImage(moveSquare, board[valid.getRow()][valid.getColumn()].getRenderSquare().x,
+							board[valid.getRow()][valid.getColumn()].getRenderSquare().y, squareSize, squareSize, null);
 		}
 		
 		//For every valid attack position draw a red square on the position
 		for (Coordinates valid : BoardMoviments.validAttack) {
-			graph.drawImage(Assets.attack_square, board[valid.getRow()][valid.getColumn()].getRenderSquare().x,
-					board[valid.getRow()][valid.getColumn()].getRenderSquare().y, Assets.getSquareSize(),
-					Assets.getSquareSize(), null);
+			graph.drawImage(attackSquare, board[valid.getRow()][valid.getColumn()].getRenderSquare().x,
+							board[valid.getRow()][valid.getColumn()].getRenderSquare().y, squareSize, squareSize, null);
 		}
 	}
 
@@ -187,37 +212,30 @@ public class GameState extends State {
 				if (type == PieceInfo.DEAD)
 					continue;
 
-				if (j == 0) //Draw a white piece
-					graph.drawImage(Assets.whitePiece[type.value],
-							board[piecePoint.getRow()][piecePoint.getColumn()].getRenderSquare().x,
-							board[piecePoint.getRow()][piecePoint.getColumn()].getRenderSquare().y, Assets.getPieceSize(),
-							Assets.getPieceSize(), null);
-				else //Draw a black piece
-					graph.drawImage(Assets.blackPiece[type.value],
-							board[piecePoint.getRow()][piecePoint.getColumn()].getRenderSquare().x,
-							board[piecePoint.getRow()][piecePoint.getColumn()].getRenderSquare().y, Assets.getPieceSize(),
-							Assets.getPieceSize(), null);
+				graph.drawImage(renderPieceBox[j][type.value],
+								board[piecePoint.getRow()][piecePoint.getColumn()].getRenderSquare().x,
+								board[piecePoint.getRow()][piecePoint.getColumn()].getRenderSquare().y, squareSize, squareSize, null);
 			}
 		}
 	}
 
 	private void renderSubMenu(Graphics graph) {
 		/*Draw the subMenu*/
-		graph.drawImage(Assets.gameLogo, 0, (int)(100 * game.scale), Assets.getLogoWidth(), Assets.getLogoHeight(), null);
-		if (drawOption) // if draw was selected then show the message "Accept draw request"
-			graph.drawImage(Assets.acceptDraw, (int) (60 * game.scale), (int) ((530 * game.scale)), 
-					Assets.acceptDraw.getWidth(), Assets.acceptDraw.getHeight(), null);
+		graph.drawImage(gameLogo, 0, (int)(100 * game.getScale()), logoWidth, logoHeight, null);
+		
+		if (drawOption) { // if draw was selected then show the message "Accept draw request"
+			graph.drawImage(acceptDraw, (int) (160 * game.getScale()), (int) ((530 * game.getScale())), 
+					(int) (acceptDraw.getWidth() * game.getScale()), (int) (acceptDraw.getHeight()* game.getScale()), null);
+		}
 		getUIButtons().render(graph); // render buttons on the screen
 	}
 
 	@Override
 	public UIList getUIButtons() {
 		/*Control what button should be executed*/
-		if(drawOption)
-		{
+		if(drawOption) {
 			return drawButtons;
-		} else if(subMenu)
-		{
+		} else if(subMenu) {
 			return subMenuButtons;
 		} 
 		return null;
@@ -225,151 +243,236 @@ public class GameState extends State {
 
 	private int move(int line) {
 		/*Internal method used to map the squares of the table in screen coordinates*/
-		return Assets.getEdge() + (line * Assets.getMoveDistance());
+		return edge + (line * moveDistance);
 	}
 
-	private void initPromotionSquares()
-	{
-		int step = game.width/4;
+	private void initPromotion() {
+		int step = game.getWidth()/4;
+		promoteSquare = ImageLoader.loadImage("/background/yellow_square.png");
 		promotionChoices = new ArrayList<>();
 		
-		for(int i = step - (int)(190 * game.scale) ; i < game.width ; i += step)
-		{
-			promotionChoices.add(new Rectangle(i, (int)(game.height/2) - (Assets.getPieceSize()/2), Assets.getSquareSize(), Assets.getSquareSize()));
+		for(int i = step - (int)(190 * game.getScale()) ; i < game.getWidth() ; i += step) {
+			promotionChoices.add(new Rectangle(i, (int)(game.getHeight()/2) - (squareSize/2), squareSize, squareSize));
 		}
 	}
 	
 	private void initDrawMenuButtons()
 	{
+		//System.out.println("GameState: DrawMenuButtons load");
+		BufferedImage[] buttonYes = new BufferedImage[2];
+		BufferedImage[] buttonNo = new BufferedImage[2];
+		
+		buttonYes[0] = ImageLoader.loadImage("/button/yes_w.png");
+		buttonYes[1] = ImageLoader.loadImage("/button/yes_b.png");
+		buttonNo[0] = ImageLoader.loadImage("/button/no_w.png");
+		buttonNo[1] = ImageLoader.loadImage("/button/no_b.png");
+		
 		drawButtons = new UIList();
 
-		float buttonWidth = Assets.buttonYes[0].getWidth() * game.scale;
-		float buttonHeight = Assets.buttonYes[0].getHeight() * game.scale;
+		float buttonWidth = buttonYes[0].getWidth() * game.getScale();
+		float buttonHeight = buttonYes[0].getHeight() * game.getScale();
+		
 
 		/*Add to the draw button list the yes button, this button is used to accept the draw proposal when draw option was selected
 		 * if active the end game, close the subMenu and set the winnerMessage to a draw message*/
-		drawButtons.getButtons()
-				.add(new UIButton((int) (((game.width / 2) - 155) * game.scale), (int) ((670 * game.scale)),
-						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonYes, -1, new ButtonAction() {
-							public void action() { //If this button was selected
-									endGame = true; //Set the game to end
-									subMenu = false; // Set the menu to close
-									winnerMessage = Assets.draw; // Set ending message to a draw
-									drawOption = false; //Set draw option to close
-									game.getKeyboard().mESC = false; //Set ESC key to not pressed
-							}
+		drawButtons.getButtons().add(new UIButton((int) ((game.getWidth() / 2) - (250 * game.getScale())), (int) ((670 * game.getScale())),
+									(int) (buttonWidth), (int) (buttonHeight), buttonYes, -1, 
+									new ButtonAction() {
+										public void action() { //If this button was selected
+												endGame = true; //Set the game to end
+												winnerMessage = ImageLoader.loadImage("/background/draw_game_background.png"); // Set ending message to a draw
+												subMenu = false;
+												drawOption = false; //Set draw option to close
+												game.getKeyboard().mESC = false; //Set ESC key to not pressed
+										}
+									}));
 
-						}));
-
-		buttonWidth = Assets.buttonNo[0].getWidth() * game.scale;
-		buttonHeight = Assets.buttonNo[0].getHeight() * game.scale;
+		buttonWidth = buttonNo[0].getWidth() * game.getScale();
+		buttonHeight = buttonNo[0].getHeight() * game.getScale();
 
 		/*Add to the draw button list the no button, this button is used negate the draw proposal when draw option was selected
 		 * if clicked the no button closes the draw message and the menu and go back to the game*/
-		drawButtons.getButtons()
-				.add(new UIButton((int) (((game.width / 2) + 230) * game.scale), (int) ((670 * game.scale)),
-						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonNo, -1, new ButtonAction() {
-							public void action() { //If this button was selected
-									drawOption = false; //Set draw option to close
-									subMenu = false;  // Set the menu to close
-									game.getKeyboard().mESC = false; //Set ESC key to not pressed
-							}
-						}));
+		drawButtons.getButtons().add(new UIButton((int) ((game.getWidth() / 2) + (120 * game.getScale())), (int) ((670 * game.getScale())),
+									(int) (buttonWidth), (int) (buttonHeight), buttonNo, -1, 
+									new ButtonAction() {
+										public void action() { //If this button was selected
+												drawOption = false; //Set draw option to close
+												releaseMenu = true; //Let release menu memory be free and close the menu
+												game.getKeyboard().mESC = false; //Set ESC key to not pressed
+										}
+									}));
 
 	}
 	
 	private void initSubMenuButtons() {
 		/*Method that initialize all buttons used on the game state*/
-		float buttonWidth = Assets.buttonQuit[0].getWidth() * game.scale;
-		float buttonHeight = Assets.buttonQuit[0].getHeight() * game.scale;
+		//System.out.println("GameState: subMenuButtons load");
+		BufferedImage[] buttonSave = new BufferedImage[2];;
+		BufferedImage[] buttonQuit = new BufferedImage[2];
+		BufferedImage[] buttonDraw = new BufferedImage[2];;
+		BufferedImage[] buttonContinue = new BufferedImage[2];
+
+		buttonSave[0] = ImageLoader.loadImage("/button/save_w.png");
+		buttonSave[1] = ImageLoader.loadImage("/button/save_b.png");
+		buttonQuit[0] = ImageLoader.loadImage("/button/quit_w.png");
+		buttonQuit[1] = ImageLoader.loadImage("/button/quit_b.png");
+		buttonDraw[0] = ImageLoader.loadImage("/button/draw_w.png");
+		buttonDraw[1] = ImageLoader.loadImage("/button/draw_b.png");
+		buttonContinue[0] = ImageLoader.loadImage("/button/continue_w.png");
+		buttonContinue[1] = ImageLoader.loadImage("/button/continue_b.png");
+		
+		float buttonWidth = buttonQuit[0].getWidth() * game.getScale();
+		float buttonHeight = buttonQuit[0].getHeight() * game.getScale();
 
 		subMenuButtons = new UIList();
 		/*Add to the subMenu list the Quit button, this button is used to give up and quit the game screen
 		 * for every button a Button action is defined when passing the argument, this way is possible to program the button when creating it*/
-		subMenuButtons.getButtons().add(new UIButton((int) (150 * game.scale), (int) ((550 * game.scale)),
-						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonQuit, -1, new ButtonAction() {
-							public void action() { //If this button was selected
-								/*Quit button action implements*/
-								//If exitMenu is true it means that ESC key was pressed than it can active this action if pressed on button
-								if (subMenu) {
-									subMenu = false;
-									
-									//Active the end game, if the turn is white and it clicked on the quit it means white piece loses, else
-									//black pieces clicked the white piece wins
-									endGame = true;
-									if (actualTurn == ColorInfo.WHITE)
-										winnerMessage = Assets.congratz[ColorInfo.BLACK.value]; //white piece victory image
-									else
-										winnerMessage = Assets.congratz[ColorInfo.WHITE.value]; //black piece victory image
-									
-									game.getKeyboard().mESC = false;//Set ESC key to not pressed
-								}
-							}
+		subMenuButtons.getButtons().add(new UIButton((int) (150 * game.getScale()), (int) ((550 * game.getScale())),
+										(int) (buttonWidth), (int) (buttonHeight), buttonQuit, -1,
+										new ButtonAction() {
+											public void action() { //If this button was selected
+												/*Quit button action implements*/
+												//Active the end game, if the turn is white and it clicked on the quit it means white piece loses, else
+												//black pieces clicked the white piece wins
+												endGame = true;
+												checkmated = true;
+												actualTurn = actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE; //Change the turn to the winner turn
+												game.getKeyboard().mESC = false;//Set ESC key to not pressed
+											}
+										}));
 		
-						}));
-		
-		buttonWidth = Assets.buttonSave[0].getWidth() * game.scale;
-		buttonHeight = Assets.buttonSave[0].getHeight() * game.scale;
+		buttonWidth = buttonSave[0].getWidth() * game.getScale();
+		buttonHeight = buttonSave[0].getHeight() * game.getScale();
 
 		/*Add to the subMenu list the Save button, this button is used to save the game and go back to the menu state*/
-		subMenuButtons.getButtons().add(new UIButton((int) ((game.width / 2) - (buttonWidth / 2)), (int) ((550 * game.scale)),
-						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonSave, -1, new ButtonAction() {
-							public void action() { //If this button was selected
-								/*Save button action implements*/
-								//System.out.println("Save a game name");
-								try {
-									SaveGame.save(actualTurn.value, pieceBox);
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-								subMenu = false;
-								game.getKeyboard().mESC = false; //Set ESC key to not pressed
-								
-							}
-
-						}));
+		subMenuButtons.getButtons().add(new UIButton((int) ((game.getWidth() / 2) - (buttonWidth / 2)), (int) ((550 * game.getScale())),
+										(int) (buttonWidth), (int) (buttonHeight), buttonSave, -1,
+										new ButtonAction() {
+											public void action() { //If this button was selected
+												/*Save button action implements*/
+												//System.out.println("Save a game name");
+												try {
+													SaveGame.save(actualTurn.value, pieceBox);
+												} catch (Exception e) {
+													e.printStackTrace();
+												}
+												releaseMenu = true; //Let release menu memory be free and close the menu
+												game.getKeyboard().mESC = false; //Set ESC key to not pressed
+												
+											}
+				
+										}));
 		
-		buttonWidth = Assets.buttonDraw[0].getWidth() * game.scale;
-		buttonHeight = Assets.buttonDraw[0].getHeight() * game.scale;
+		buttonWidth = buttonDraw[0].getWidth() * game.getScale();
+		buttonHeight = buttonDraw[0].getHeight() * game.getScale();
 		
 		/*Add to the subMenu list the Draw button, this button is used to propose a draw game. When selected it change the buttons on the screen*/
-		subMenuButtons.getButtons().add(new UIButton((int) (740 * game.scale), (int) ((550 * game.scale)),
-				(int) (buttonWidth), (int) (buttonHeight), Assets.buttonDraw, -1, new ButtonAction() {
-							public void action() { //If this button was selected
-								drawOption = true; //Active draw msg and change what buttons will be active (Yes and No will active)
-								game.getKeyboard().mESC = false;  //Set ESC key to not pressed
-							}
-		
-						}));
+		subMenuButtons.getButtons().add(new UIButton((int) (740 * game.getScale()), (int) ((550 * game.getScale())),
+										(int) (buttonWidth), (int) (buttonHeight), buttonDraw, -1,
+										new ButtonAction() {
+													public void action() { //If this button was selected
+														initDrawMenuScreen(); // Active draw buttons
+														drawOption = true; //Active draw msg and change what buttons will be active (Yes and No will active)
+														game.getKeyboard().mESC = false;  //Set ESC key to not pressed
+													}
+								
+												}));
 
-		buttonWidth = Assets.buttonContinue[0].getWidth() * game.scale;
-		buttonHeight = Assets.buttonContinue[0].getHeight() * game.scale;
+		buttonWidth = buttonContinue[0].getWidth() * game.getScale();
+		buttonHeight = buttonContinue[0].getHeight() * game.getScale();
 
 		/*Add to the subMenu list the continue button, this button is used to close the subMenu and go back to the game*/
-		subMenuButtons.getButtons()
-				.add(new UIButton((int) ((game.width / 2) - (buttonWidth / 2)), (int) ((670 * game.scale)),
-						(int) (buttonWidth), (int) (buttonHeight), Assets.buttonContinue, -1, new ButtonAction() {
-							public void action() { //If this button was selected
-								subMenu = false; //Close the submenu
-								game.getKeyboard().mESC = false; //Set ESC key to not pressed
-							}
-
-						}));
+		subMenuButtons.getButtons().add(new UIButton((int) ((game.getWidth() / 2) - (buttonWidth / 2)), (int) ((670 * game.getScale())),
+										(int) (buttonWidth), (int) (buttonHeight), buttonContinue, -1,
+										new ButtonAction() {
+											public void action() { //If this button was selected
+												releaseMenu = true; //Let release menu memory be free and close the menu
+												game.getKeyboard().mESC = false; //Set ESC key to not pressed
+											}
+				
+										}));
 	}
 
+	private void initDrawMenuScreen() {
+		//System.out.println("GameState: acceptDraw load");
+		acceptDraw = ImageLoader.loadImage("/button/draw_request_w.png");
+		initDrawMenuButtons();
+	}
+	
+	private void initSubMenuScreen() {
+		//System.out.println("GameState: gameLogo load");
+		gameLogo = ImageLoader.loadImage("/background/exit_logo.png");
+		logoWidth = (int) (((float) gameLogo.getWidth()) * game.getScale());
+		logoHeight = (int) (((float) gameLogo.getHeight()) * game.getScale());
+		initSubMenuButtons();
+	}
+
+	private void initGameAssets() {
+		/*Load All utility Info for the game like board, square and pieces*/
+		//Render part
+		int edgeSize = 52;
+		int blueLineSize = 5;
+		background = ImageLoader.loadImage("/background/board.png"); //Game Background
+		
+		renderPieceBox = new BufferedImage[2][6];
+		for(int i = 0 ; i < 6 ; i++) { //6 is the number of different pieces
+			renderPieceBox[0][i] = ImageLoader.loadImage("/pieces/w_" + i + ".png");
+			renderPieceBox[1][i] = ImageLoader.loadImage("/pieces/b_" + i + ".png");
+		}
+		
+		moveSquare = ImageLoader.loadImage("/background/blue_square.png");
+		attackSquare = ImageLoader.loadImage("/background/red_square.png");
+		selectSquare = ImageLoader.loadImage("/background/purple_square.png");
+		squareSize = (int) (((float) selectSquare.getWidth() - 2) * game.getScale());
+		moveDistance = (int) ((float) (selectSquare.getWidth() - 2 + blueLineSize) * game.getScale());
+		edge = (int) Math.round((((float) edgeSize * game.getScale())));
+		
+		//Logic part
+		BoardMoviments.initializePieceMovements(); // Pieces movement rules
+	}
+	
+	
+	private void releaseUIButtons() {
+		/*Release all submenu memory*/
+		//System.out.println("GameState: submenuButtons free");
+		//System.out.println("GameState: gameLogo free");
+		gameLogo = null;
+		subMenuButtons.getButtons().clear();
+		subMenuButtons = null;
+		if(drawButtons != null) {
+			//System.out.println("GameState: drawButtons free");
+			//System.out.println("GameState: acceptDraw free");
+			drawButtons.getButtons().clear();
+			drawButtons = null;
+			acceptDraw = null;
+		}
+	}
+	
 	private void newGame() {
 		/*Method that initialize all pieces at default position*/
+		board = new Square[8][8]; // Table of the game
+		pieceBox = new PieceList[2]; //PieceBox has the a array list with all the white pieces and other with the black pieces
+		initGameAssets();
 		State.newGame = false;
 		actualTurn = ColorInfo.WHITE;
 		pieceBox[0] = new PieceList(ColorInfo.WHITE);
 		pieceBox[1] = new PieceList(ColorInfo.BLACK);
 		initBoard();
+		if(State.savedGames != null)
+		{
+			State.savedGames.clear();			
+			State.savedGames = null;
+		}
 	}
 
 	private void loadGame(String gameName) {
-		//Chamar a fun��o que busca por nome
+		/*Load the game using a saved game name*/
 		//System.out.println(State.lastButtonIndex);
 		//System.out.println("SEARCH FOR SAVED GAME NAME: " + State.savedGames.get(State.lastButtonIndex));
+		board = new Square[8][8]; // Table of the game
+		pieceBox = new PieceList[2];
+		State.loadGame = false;
+		initGameAssets();
 		try {
 			System.out.println("Load game: ");
 			actualTurn = LoadGame.loadGame(gameName, pieceBox);
@@ -378,16 +481,43 @@ public class GameState extends State {
 		}
 		
 		State.savedGames.clear();
-		State.loadGame = false;
+		State.savedGames = null;
 		initBoard();
 	}
 
+	private void exitGameState() {
+		/*Release all memory used by the game State*/
+		//System.out.println("GameState: Release All Memory");
+		game.getMouse().setLeftButtonPressed(false);
+		game.getKeyboard().mESC = false;
+		
+		/*Completes release all boardMoviments*/
+		BoardMoviments.selectedPiece = null;
+		BoardMoviments.validAttack.clear();
+		BoardMoviments.validMoves.clear();
+		BoardMoviments.possiblePiecesMovements.clear();
+		
+		board = null;
+		pieceBox = null;
+		actualTurn = null;
+		
+		releaseUIButtons();
+		
+		subMenu = false;
+		drawOption = false;
+		releaseMenu = false;
+		
+		winnerMessage = null;
+		background = null;
+		endGame = false;
+	}
+	
 	private void initBoard() {
 		//Init all squares and pieces positions
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				board[i][j] = new Square();
-				board[i][j].setRenderSquare(new Rectangle(move(j), move(i), Assets.getPieceSize(), Assets.getPieceSize()));
+				board[i][j].setRenderSquare(new Rectangle(move(j), move(i), squareSize, squareSize));
 			}
 		}
 

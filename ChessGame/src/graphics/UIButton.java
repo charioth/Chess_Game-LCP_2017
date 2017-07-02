@@ -12,6 +12,7 @@ public class UIButton {
 	 * a onButton attribute to control when the mouse is on the button
 	 * a bufferedImage vector to hold the 2 images of the button
 	 * a Rectangle to test if the mouse position is on bound with the button area
+	 * a vector Text if the button uses dynamic messages
 	 * and last the buttonAction that tell what the button should execute when clicked*/
 	private int index;
 	private int x, y, width, height;
@@ -19,9 +20,9 @@ public class UIButton {
 	private BufferedImage button[];
 	private Rectangle bound;
 	private ButtonAction click;
-	private Text text;
+	private Text text[];
 	
-	//Passing the ButtonAction as parameter is possible to program the button when creating it
+	//Constructor that does not use Text
 	public UIButton(int x, int y, int width, int height, BufferedImage button[], int index, ButtonAction click) {
 		this.x = x;
 		this.y = y;
@@ -35,7 +36,24 @@ public class UIButton {
 		this.index = index;
 	}
 	
+	//Constructor that use one Text
 	public UIButton(int x, int y, int width, int height, BufferedImage button[], int index, Text text, ButtonAction click) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+		this.button = button;
+		onButton = false;
+		bound = new Rectangle(x, y, width, height);
+		this.click = click;
+		this.text = new Text[2];
+		this.text[0] = text;
+		this.text[1] = text;
+		this.index = index;
+	}
+	
+	//Constructor that use two Texts
+	public UIButton(int x, int y, int width, int height, BufferedImage button[], int index, Text text[], ButtonAction click) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -55,12 +73,10 @@ public class UIButton {
 		 * if is true than render the second image*/
 		if (onButton == false) {
 			graph.drawImage(button[0], x, y, width, height, null);
+			if(text != null) text[0].render(graph);
 		} else {
 			graph.drawImage(button[1], x, y, width, height, null);
-		}
-		if(text != null)
-		{
-			text.render(graph);
+			if(text != null) text[1].render(graph);
 		}
 
 	}
@@ -120,12 +136,12 @@ public class UIButton {
 		this.height = height;
 	}
 
-	public Text getText()
+	public Text[] getText()
 	{
 		return text;
 	}
 	
-	public void setText(Text text)
+	public void setText(Text text[])
 	{
 		this.text = text;
 	}
