@@ -17,6 +17,9 @@ public abstract class State {
 	protected static boolean loadGame;
 	protected static ArrayList<String> savedGames;
 	
+	//GameState to MenuState signals
+	protected static boolean loadMenuState;
+	
 	protected Game game;
 
 	State(Game game) {
