@@ -124,7 +124,7 @@ public class GameState extends State {
 			}
 			else if (BoardMovements.isValidMove(game.getMouse())) { // if there is a piece selected then wait until the player click on a valid position
 				BoardMovements.movePiece(game.getMouse(), BoardMovements.selectedPiece, board, pieceBox, actualTurn);
-				if(!(promoteMenu = BoardMoviments.promotePawn(BoardMovements.selectedPiece))) { // if promote not true than chance turn
+				if(!(promoteMenu = BoardMovements.promotePawn(BoardMovements.selectedPiece))) { // if promote not true than chance turn
 					BoardMovements.selectedPiece = null; //Deselect piece
 					actualTurn = actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE; // Change turn
 				} else {
@@ -428,7 +428,7 @@ public class GameState extends State {
 		edge = (int) Math.round((((float) edgeSize * game.getScale())));
 		
 		//Logic part
-		BoardMoviments.initializePieceMovements(); // Pieces movement rules
+		BoardMovements.initializePieceMovements(); // Pieces movement rules
 	}
 	
 	
@@ -492,10 +492,10 @@ public class GameState extends State {
 		game.getKeyboard().mESC = false;
 		
 		/*Completes release all boardMoviments*/
-		BoardMoviments.selectedPiece = null;
-		BoardMoviments.validAttack.clear();
-		BoardMoviments.validMoves.clear();
-		BoardMoviments.possiblePiecesMovements.clear();
+		BoardMovements.selectedPiece = null;
+		BoardMovements.validAttack.clear();
+		BoardMovements.validMoves.clear();
+		BoardMovements.possiblePiecesMovements.clear();
 		
 		board = null;
 		pieceBox = null;
