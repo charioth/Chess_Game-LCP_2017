@@ -4,7 +4,7 @@ import game.ColorInfo;
 import game.Coordinates;
 
 public class PieceList {
-	/* All the pieces in the game */
+	/* All the pieces of a color */
 	private Piece[] pieces;
 
 	public PieceList() {

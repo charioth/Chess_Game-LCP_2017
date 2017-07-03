@@ -40,6 +40,6 @@ public class Coordinates {
 
 	@Override
 	public String toString() {
-		return "Row: " + row + " Column " + column;
+		return "Row: " + row + " Column: " + column;
 	}
 }
