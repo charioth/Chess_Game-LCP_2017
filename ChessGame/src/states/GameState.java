@@ -88,7 +88,14 @@ public class GameState extends State {
 					if(position.contains(game.getMouse().getMouseX(), game.getMouse().getMouseY())) {
 						BoardMovements.selectedPiece.setType(PieceInfo.values()[counter]);
 						BoardMovements.selectedPiece = null;
-						actualTurn = actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE; // Change turn
+						if(BoardMovements.isCheckmate(board, actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE, pieceBox)) {
+							endGame = true;
+							checkmated = true;
+						} else if(BoardMovements.isStaleMate(board, pieceBox, actualTurn)) {
+							endGame = true;
+						} else {							
+							actualTurn = actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE; // Change turn
+						}
 						promotionChoices.clear(); //Releases memory used to render the promotion
 						promotionChoices = null;
 						promoteSquare = null;
@@ -125,8 +132,16 @@ public class GameState extends State {
 			else if (BoardMovements.isValidMove(game.getMouse())) { // if there is a piece selected then wait until the player click on a valid position
 				BoardMovements.movePiece(game.getMouse(), BoardMovements.selectedPiece, board, pieceBox, actualTurn);
 				if(!(promoteMenu = BoardMovements.promotePawn(BoardMovements.selectedPiece))) { // if promote not true than chance turn
-					BoardMovements.selectedPiece = null; //Deselect piece
-					actualTurn = actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE; // Change turn
+					if(BoardMovements.isCheckmate(board, actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE, pieceBox)) {
+						endGame = true;
+						checkmated = true;
+					} else if(BoardMovements.isStaleMate(board, pieceBox, actualTurn)) {
+						endGame = true;
+					} else
+					{						
+						BoardMovements.selectedPiece = null; //Deselect piece
+						actualTurn = actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE; // Change turn
+					}
 				} else {
 					initPromotion(); //Initialize promotion rectangles to get the choose piece
 				}
@@ -437,14 +452,17 @@ public class GameState extends State {
 		//System.out.println("GameState: submenuButtons free");
 		//System.out.println("GameState: gameLogo free");
 		gameLogo = null;
-		subMenuButtons.getButtons().clear();
-		subMenuButtons = null;
-		if(drawButtons != null) {
-			//System.out.println("GameState: drawButtons free");
-			//System.out.println("GameState: acceptDraw free");
-			drawButtons.getButtons().clear();
-			drawButtons = null;
-			acceptDraw = null;
+		if(subMenuButtons != null)
+		{			
+			subMenuButtons.getButtons().clear();
+			subMenuButtons = null;
+			if(drawButtons != null) {
+				//System.out.println("GameState: drawButtons free");
+				//System.out.println("GameState: acceptDraw free");
+				drawButtons.getButtons().clear();
+				drawButtons = null;
+				acceptDraw = null;
+			}
 		}
 	}
 	

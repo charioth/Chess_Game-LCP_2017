@@ -203,7 +203,7 @@ public class BoardMovements {
 		}
 	}
 	
-	public boolean isStaleMate(final Square board[][], PieceList[] pieceBox, ColorInfo turn) {
+	public static boolean isStaleMate(final Square board[][], PieceList[] pieceBox, ColorInfo turn) {
 		List<Coordinates> testStalemate = new ArrayList<Coordinates>();
 		
 		for(Piece piece : pieceBox[turn.value].getPieces()) {
