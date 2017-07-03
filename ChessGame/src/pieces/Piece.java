@@ -70,7 +70,7 @@ public class Piece {
 				// There is a piece to capture
 				if (board[row + side][column + 1].getPieceID() != -1 && board[row + side][column + 1].getColor() != this.getColor()) {
 					//validAttack.add(point(row + side, column + 1));
-					BoardMovements.validateAttack(board, this, this.getColor(), pieceBox, validAttack, row + side, column - 1);
+					BoardMovements.validateAttack(board, this, this.getColor(), pieceBox, validAttack, row + side, column + 1);
 				}
 			}
 		}

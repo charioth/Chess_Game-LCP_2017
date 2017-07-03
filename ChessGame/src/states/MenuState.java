@@ -6,9 +6,8 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-
-import DAO.DeleteGame;
-import DAO.LoadGame;
+import database.DeleteGame;
+import database.LoadGame;
 import game.Game;
 import graphics.ButtonAction;
 import graphics.Text;

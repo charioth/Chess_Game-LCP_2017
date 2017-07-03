@@ -1,4 +1,4 @@
-package DAO;
+package database;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -24,7 +24,7 @@ public class SaveGame {
 		try {
 			//Automatically created name
 			gameName = "SaveGame" + String.format("%tH:%tM:%tS ", date, date, date); //Time formatted for the 24-hour clock as "%tH:%tM:%tS"
-			System.out.println(String.format("%tm/%td/%ty", date, date, date));
+			//System.out.println(String.format("%tm/%td/%ty", date, date, date));
 			saveGame(gameName, actualTurn, String.format("%tm/%td/%ty", date, date, date), stmt); //Date formatted as "%tm/%td/%ty"
 			savePieces(gameName, pieceBox, stmt); //Save the pieces information
 

@@ -6,8 +6,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import DAO.LoadGame;
-import DAO.SaveGame;
+import database.LoadGame;
+import database.SaveGame;
 import game.ColorInfo;
 import game.Game;
 import game.BoardMovements;
