@@ -87,7 +87,7 @@ public class LoadGame {
 			
 			/*Add to the list all saved game names and dates*/
 			while(rs.next()) {
-				games.add(rs.getString("name"));// + "	" + rs.getString("save_date"));
+				games.add(rs.getString("name") + " " + rs.getString("save_date"));
 			}
 			rs.close();
 			
