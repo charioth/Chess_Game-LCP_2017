@@ -77,8 +77,8 @@ public class BoardMovements {
 			ColorInfo turn) {
 		/* Move the selected piece */
 		int adversaryColor = (turn.value == ColorInfo.WHITE.value ? ColorInfo.BLACK.value : ColorInfo.WHITE.value);
-		//ColorInfo pieceColor = board[piece.getActualPosition().getRow()][piece.getActualPosition().getColumn()].getColor(); // Get color of selectedPiece
-		//int pieceID = board[piece.getActualPosition().getRow()][piece.getActualPosition().getColumn()].getPieceID();
+		ColorInfo pieceColor = board[piece.getActualPosition().getRow()][piece.getActualPosition().getColumn()].getColor(); // Get color of selectedPiece
+		int pieceID = board[piece.getActualPosition().getRow()][piece.getActualPosition().getColumn()].getPieceID();
 		int row = (mouse.getMouseY() - Assets.getEdge()) / Assets.getMoveDistance();
 		int column = (mouse.getMouseX() - Assets.getEdge()) / Assets.getMoveDistance();
 
@@ -95,8 +95,8 @@ public class BoardMovements {
 		piece.setActualPosition(point(row, column));
 
 		// Update the board parameters of new position
-		board[row][column].setPieceID(piece.getIndex());
-		board[row][column].setColor(turn);
+		board[row][column].setPieceID(pieceID);
+		board[row][column].setColor(pieceColor);
 	}
 
 	private static void fakeMove(Piece piece, Square copy[][], ColorInfo pieceColor, int row, int column) {
@@ -167,7 +167,7 @@ public class BoardMovements {
 	}
 
 	private static boolean isChecked(final Square board[][], ColorInfo turn, PieceList[] pieceBox) {
-		/* For each piece see if it can reach the opposite color king */
+		/* For each piece of opposite color see if it can reach the king */
 		int enemyTurn = (turn.value == ColorInfo.WHITE.value ? ColorInfo.BLACK.value : ColorInfo.WHITE.value);
 
 		for (Piece testCheck : pieceBox[enemyTurn].getPieces()) {
@@ -202,10 +202,31 @@ public class BoardMovements {
 			validList.add(point(row, column));
 		}
 	}
-
-	public static boolean isCheckmated(final Square board[][], ColorInfo turn) {
-		// Piece King =
+	
+	public boolean isStaleMate(final Square board[][], PieceList[] pieceBox, ColorInfo turn) {
+		List<Coordinates> testStalemate = new ArrayList<Coordinates>();
+		
+		for(Piece piece : pieceBox[turn.value].getPieces()) {
+			piece.move(testStalemate, testStalemate, board, possiblePiecesMovements.get(piece.getType()), pieceBox);
+			if(!testStalemate.isEmpty()) {
+				return false;
+			}
+		}
+		
 		return true;
+	}
+	
+	public static boolean isCheckmate(final Square board[][], ColorInfo turn, PieceList[] pieceBox) {
+		Piece king = pieceBox[turn.value].getPieces()[0];
+		List<Coordinates> testCheckmate = new ArrayList<Coordinates>();
+		
+		king.move(testCheckmate, testCheckmate, board, possiblePiecesMovements.get(king.getType()), pieceBox);
+		if(testCheckmate.isEmpty()) {
+			if(isChecked(board, turn, pieceBox)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static boolean promotePawn(Piece movedPawn) {
