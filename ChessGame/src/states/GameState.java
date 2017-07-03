@@ -10,7 +10,7 @@ import DAO.LoadGame;
 import DAO.SaveGame;
 import game.ColorInfo;
 import game.Game;
-import game.BoardMoviments;
+import game.BoardMovements;
 import game.Coordinates;
 import game.Square;
 import graphics.ButtonAction;
@@ -86,8 +86,8 @@ public class GameState extends State {
 				int counter = 1;
 				for(Rectangle position : promotionChoices) {
 					if(position.contains(game.getMouse().getMouseX(), game.getMouse().getMouseY())) {
-						BoardMoviments.selectedPiece.setType(PieceInfo.values()[counter]);
-						BoardMoviments.selectedPiece = null;
+						BoardMovements.selectedPiece.setType(PieceInfo.values()[counter]);
+						BoardMovements.selectedPiece = null;
 						actualTurn = actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE; // Change turn
 						promotionChoices.clear(); //Releases memory used to render the promotion
 						promotionChoices = null;
@@ -119,13 +119,13 @@ public class GameState extends State {
 			if(subMenu = game.getKeyboard().mESC) {// If the ESC key was pressed then active the subMenu
 				initSubMenuScreen(); //Load SubMenu image and buttons (Quit, Save, Draw and Continue
 			}
-			if (BoardMoviments.selectedPiece == null) {	// If there is not a piece selected
-				BoardMoviments.selectPiece(game.getMouse(), pieceBox, board, actualTurn); //executes the function that select a piece
+			if (BoardMovements.selectedPiece == null) {	// If there is not a piece selected
+				BoardMovements.selectPiece(game.getMouse(), pieceBox, board, actualTurn); //executes the function that select a piece
 			}
-			else if (BoardMoviments.isValidMove(game.getMouse())) { // if there is a piece selected then wait until the player click on a valid position
-				BoardMoviments.movePiece(game.getMouse(), BoardMoviments.selectedPiece, board, pieceBox, actualTurn);
-				if(!(promoteMenu = BoardMoviments.promotePawn(BoardMoviments.selectedPiece))) { // if promote not true than chance turn
-					BoardMoviments.selectedPiece = null; //Deselect piece
+			else if (BoardMovements.isValidMove(game.getMouse())) { // if there is a piece selected then wait until the player click on a valid position
+				BoardMovements.movePiece(game.getMouse(), BoardMovements.selectedPiece, board, pieceBox, actualTurn);
+				if(!(promoteMenu = BoardMoviments.promotePawn(BoardMovements.selectedPiece))) { // if promote not true than chance turn
+					BoardMovements.selectedPiece = null; //Deselect piece
 					actualTurn = actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE; // Change turn
 				} else {
 					initPromotion(); //Initialize promotion rectangles to get the choose piece
@@ -146,7 +146,7 @@ public class GameState extends State {
 		/*Method responsible to render the game*/
 		graph.drawImage(background, 0, 0, game.getWidth(), game.getHeight(), null); //Draw the background
 		
-		if (BoardMoviments.selectedPiece != null) { // if there is a piece selected then draw the highlight positions
+		if (BoardMovements.selectedPiece != null) { // if there is a piece selected then draw the highlight positions
 			renderHighlightPath(graph);
 		}
 		renderPieces(graph); // Draw all the pieces
@@ -178,21 +178,21 @@ public class GameState extends State {
 		/*Method that highlight valid, attack and selected positions*/
 		
 		//Get selected piece position to hightlight the purple square on the same spot
-		int row = BoardMoviments.selectedPiece.getActualPosition().getRow();
-		int column = BoardMoviments.selectedPiece.getActualPosition().getColumn();
+		int row = BoardMovements.selectedPiece.getActualPosition().getRow();
+		int column = BoardMovements.selectedPiece.getActualPosition().getColumn();
 		
 		//Draw purple square
 		graph.drawImage(selectSquare, board[row][column].getRenderSquare().x,
 						board[row][column].getRenderSquare().y, squareSize, squareSize, null);
 
 		//For every valid position draw a blue square on the position
-		for (Coordinates valid : BoardMoviments.validMoves) {
+		for (Coordinates valid : BoardMovements.validMoves) {
 			graph.drawImage(moveSquare, board[valid.getRow()][valid.getColumn()].getRenderSquare().x,
 							board[valid.getRow()][valid.getColumn()].getRenderSquare().y, squareSize, squareSize, null);
 		}
 		
 		//For every valid attack position draw a red square on the position
-		for (Coordinates valid : BoardMoviments.validAttack) {
+		for (Coordinates valid : BoardMovements.validAttack) {
 			graph.drawImage(attackSquare, board[valid.getRow()][valid.getColumn()].getRenderSquare().x,
 							board[valid.getRow()][valid.getColumn()].getRenderSquare().y, squareSize, squareSize, null);
 		}

@@ -2,6 +2,7 @@ package pieces;
 
 import java.util.List;
 
+import game.BoardMovements;
 import game.ColorInfo;
 import game.Coordinates;
 import game.Square;
@@ -25,16 +26,16 @@ public class Piece {
 	}
 
 	public void move(List<Coordinates> validMoves, List<Coordinates> validAttack, final Square board[][],
-			List<List<Coordinates>> possibleMoves) {
+			List<List<Coordinates>> possibleMoves, PieceList[] pieceBox) {
 		/* Choose a movement method based on piece type */
 		if (this.type == PieceInfo.PAWN) {
-			this.pawnMovements(validMoves, validAttack, board);
+			this.pawnMovements(validMoves, validAttack, board, pieceBox);
 		} else {
-			this.pieceMovements(validMoves, validAttack, board, possibleMoves);
+			this.pieceMovements(validMoves, validAttack, board, possibleMoves, pieceBox);
 		}
 	}
 
-	public void pawnMovements(List<Coordinates> validMoves, List<Coordinates> validAttack, final Square board[][]) {
+	public void pawnMovements(List<Coordinates> validMoves, List<Coordinates> validAttack, final Square board[][], PieceList[] pieceBox) {
 
 		int row = this.getActualPosition().getRow(), column = this.getActualPosition().getColumn();
 		int side = this.getColor() == ColorInfo.WHITE ? -1 : 1;
@@ -43,7 +44,8 @@ public class Piece {
 		if (this.isMoved() == false) { //A pawn that was not moved can be moved 2 spaces forward
 			if (board[row + (2 * side)][column].getPieceID() == -1) { // There is no piece in the square
 				if (board[row + side][column].getPieceID() == -1) { // There is no piece between the pawn and the square
-					validMoves.add(point(row + (2 * side), column));
+					//validMoves.add(point(row + (2 * side), column));
+					BoardMovements.validateMovement(board, this, this.getColor(), pieceBox, validMoves, row + (2 * side), column);
 				}
 			}
 		}
@@ -52,31 +54,30 @@ public class Piece {
 		if (side * this.getActualPosition().getRow() > boundaries) {
 			// There is no piece in the square
 			if (board[row + side][column].getPieceID() == -1) {
-				validMoves.add(point(row + side, column));
+				//validMoves.add(point(row + side, column));
+				BoardMovements.validateMovement(board, this, this.getColor(), pieceBox, validMoves, row + side, column);
 			}
 			// Pawns capture diagonally
 			if (column > 0) {
 				// There is a piece to capture
 				if (board[row + side][column - 1].getPieceID() != -1 && board[row + side][column - 1].getColor() != this.getColor()) {
-					validAttack.add(point(row + side, column - 1));
+					//validAttack.add(point(row + side, column - 1));
+					BoardMovements.validateAttack(board, this, this.getColor(), pieceBox, validAttack, row + side, column - 1);
 				}
 			}
 			// Pawns capture diagonally
 			if (column < 7) {
 				// There is a piece to capture
 				if (board[row + side][column + 1].getPieceID() != -1 && board[row + side][column + 1].getColor() != this.getColor()) {
-					validAttack.add(point(row + side, column + 1));
+					//validAttack.add(point(row + side, column + 1));
+					BoardMovements.validateAttack(board, this, this.getColor(), pieceBox, validAttack, row + side, column - 1);
 				}
 			}
 		}
 	}
-	
-	private static Coordinates point(int row, int column) {
-		return new Coordinates(row, column);
-	}
-	
+
 	public void pieceMovements(List<Coordinates> validMoves, List<Coordinates> validAttack, final Square board[][],
-			List<List<Coordinates>> possibleMoves) {
+			List<List<Coordinates>> possibleMoves, PieceList[] pieceBox) {
 		int row, column, i;
 
 		for (List<Coordinates> direction : possibleMoves) { // For each possible direction
@@ -87,11 +88,12 @@ public class Piece {
 			
 			// While there is movements in that direction and its inside the board
 			while (i < direction.size() && row < 8 && column < 8 && row >= 0 && column >= 0) {
+
 				if (board[row][column].getPieceID() == -1) { // If there is no piece, its a valid destination
-					validMoves.add(new Coordinates(row, column));
+					BoardMovements.validateMovement(board, this, this.getColor(), pieceBox, validMoves, row, column);
 				} else {
 					if (board[row][column].getColor().value != this.color.value) { // If there is an enemy piece, its a valid destination
-						validAttack.add(new Coordinates(row, column));
+						BoardMovements.validateAttack(board, this, this.getColor(), pieceBox, validAttack, row, column);	
 					}
 					break; // If there is a piece, its not possible to keep going in that direction
 				}
