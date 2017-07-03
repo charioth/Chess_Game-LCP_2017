@@ -136,6 +136,7 @@ public class GameState extends State {
 						endGame = true;
 						checkmated = true;
 					} else if(BoardMovements.isStaleMate(board, pieceBox, actualTurn)) {
+						winnerMessage = ImageLoader.loadImage("/background/draw_game_background.png"); // Set ending message to a draw
 						endGame = true;
 					} else
 					{						
