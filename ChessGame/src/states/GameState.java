@@ -74,7 +74,6 @@ public class GameState extends State {
 	@Override
 	public void tick() {
 		/*tick method that runs 60 times per second*/
-		
 		if (State.newGame) { //If newGame boolean attribute is set true than it means that on the menu state, the new game button was pressed
 			newGame(); //initialize a new game table (all piece position at the start condition)
 		} else if (State.loadGame) { //if the loadGame was set than on the menu state the load button was pressed, so load the game that was been played
@@ -83,18 +82,19 @@ public class GameState extends State {
 		
 		if(promoteMenu) { // If promote occured
 			if (game.getMouse().isLeftButtonPressed()) { //Wait left mouse button click
+				ColorInfo enemyTurn = (actualTurn == ColorInfo.WHITE) ? ColorInfo.BLACK : ColorInfo.WHITE;
 				int counter = 1;
 				for(Rectangle position : promotionChoices) {
 					if(position.contains(game.getMouse().getMouseX(), game.getMouse().getMouseY())) {
 						BoardMovements.selectedPiece.setType(PieceInfo.values()[counter]);
 						BoardMovements.selectedPiece = null;
-						if(BoardMovements.isCheckmate(board, actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE, pieceBox)) {
+						if(BoardMovements.isCheckmate(board, enemyTurn, pieceBox)) {
 							endGame = true;
 							checkmated = true;
-						} else if(BoardMovements.isStaleMate(board, pieceBox, actualTurn)) {
+						} else if(BoardMovements.isStaleMate(board, pieceBox, enemyTurn)) {
 							endGame = true;
 						} else {							
-							actualTurn = actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE; // Change turn
+							actualTurn = enemyTurn; // Change turn
 						}
 						promotionChoices.clear(); //Releases memory used to render the promotion
 						promotionChoices = null;
@@ -132,16 +132,17 @@ public class GameState extends State {
 			else if (BoardMovements.isValidMove(game.getMouse())) { // if there is a piece selected then wait until the player click on a valid position
 				BoardMovements.movePiece(game.getMouse(), BoardMovements.selectedPiece, board, pieceBox, actualTurn);
 				if(!(promoteMenu = BoardMovements.promotePawn(BoardMovements.selectedPiece))) { // if promote not true than chance turn
-					if(BoardMovements.isCheckmate(board, actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE, pieceBox)) {
+					ColorInfo enemyTurn = (actualTurn == ColorInfo.WHITE) ? ColorInfo.BLACK : ColorInfo.WHITE;
+					if(BoardMovements.isCheckmate(board, enemyTurn, pieceBox)) {
 						endGame = true;
 						checkmated = true;
-					} else if(BoardMovements.isStaleMate(board, pieceBox, actualTurn)) {
+					} else if(BoardMovements.isStaleMate(board, pieceBox, enemyTurn)) {
 						winnerMessage = ImageLoader.loadImage("/background/draw_game_background.png"); // Set ending message to a draw
 						endGame = true;
 					} else
 					{						
 						BoardMovements.selectedPiece = null; //Deselect piece
-						actualTurn = actualTurn == ColorInfo.WHITE ? ColorInfo.BLACK : ColorInfo.WHITE; // Change turn
+						actualTurn = enemyTurn; // Change turn
 					}
 				} else {
 					initPromotion(); //Initialize promotion rectangles to get the choose piece

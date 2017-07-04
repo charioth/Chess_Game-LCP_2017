@@ -205,8 +205,9 @@ public class BoardMovements {
 	
 	public static boolean isStaleMate(final Square board[][], PieceList[] pieceBox, ColorInfo turn) {
 		List<Coordinates> testStalemate = new ArrayList<Coordinates>();
-		
+
 		for(Piece piece : pieceBox[turn.value].getPieces()) {
+			if(piece.getType() == PieceInfo.DEAD) continue;
 			piece.move(testStalemate, testStalemate, board, possiblePiecesMovements.get(piece.getType()), pieceBox);
 			if(!testStalemate.isEmpty()) {
 				return false;
@@ -221,7 +222,7 @@ public class BoardMovements {
 		List<Coordinates> testCheckmate = new ArrayList<Coordinates>();
 		
 		king.move(testCheckmate, testCheckmate, board, possiblePiecesMovements.get(king.getType()), pieceBox);
-		if(testCheckmate.isEmpty()) {
+		if(testCheckmate.isEmpty() && isStaleMate(board, pieceBox, turn)) {
 			if(isChecked(board, turn, pieceBox)) {
 				return true;
 			}
