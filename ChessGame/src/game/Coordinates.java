@@ -37,6 +37,12 @@ public class Coordinates {
 		}
 		return false;
 	}
+	
+	public boolean equals(int row, int column) {
+		if (this.row == row && this.column == column)
+			return true;
+		return false;
+	}
 
 	@Override
 	public String toString() {

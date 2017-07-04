@@ -40,7 +40,7 @@ public class Piece {
 		int row = this.getActualPosition().getRow(), column = this.getActualPosition().getColumn();
 		int side = this.getColor() == ColorInfo.WHITE ? -1 : 1;
 		int boundaries = this.getColor() == ColorInfo.WHITE ? -7 : 0;
-
+		
 		if (this.isMoved() == false) { //A pawn that was not moved can be moved 2 spaces forward
 			if (board[row + (2 * side)][column].getPieceID() == -1) { // There is no piece in the square
 				if (board[row + side][column].getPieceID() == -1) { // There is no piece between the pawn and the square

@@ -47,7 +47,7 @@ public class GameState extends State {
 	
 	// Promotion render info
 	private List<Rectangle> promotionChoices;
-	private BufferedImage promoteSquare;
+	private BufferedImage promoteBackground;
 		
 	public BufferedImage gameLogo; //SubMenu logo
 	private BufferedImage acceptDraw;
@@ -57,6 +57,7 @@ public class GameState extends State {
 	private BufferedImage moveSquare;
 	private BufferedImage attackSquare;
 	private BufferedImage selectSquare;
+	private BufferedImage specialSquare;
 	private int squareSize;
 	private int moveDistance; // Used to init board rectangle x,y
 	private int edge; // Used to init board rectangle x,y
@@ -98,7 +99,8 @@ public class GameState extends State {
 						}
 						promotionChoices.clear(); //Releases memory used to render the promotion
 						promotionChoices = null;
-						promoteSquare = null;
+						promoteBackground = null;
+						specialSquare = null;
 						promoteMenu = false;
 						break;
 					}
@@ -127,10 +129,11 @@ public class GameState extends State {
 				initSubMenuScreen(); //Load SubMenu image and buttons (Quit, Save, Draw and Continue
 			}
 			if (BoardMovements.selectedPiece == null) {	// If there is not a piece selected
-				BoardMovements.selectPiece(game.getMouse(), pieceBox, board, actualTurn); //executes the function that select a piece
+				BoardMovements.selectPiece(game.getMouse(), pieceBox, board, actualTurn, (game.getMouse().getMouseY() - edge) / moveDistance, (game.getMouse().getMouseX() - edge) / moveDistance); //executes the function that select a piece
 			}
-			else if (BoardMovements.isValidMove(game.getMouse())) { // if there is a piece selected then wait until the player click on a valid position
-				BoardMovements.movePiece(game.getMouse(), BoardMovements.selectedPiece, board, pieceBox, actualTurn);
+			else if (BoardMovements.isValidMove(game.getMouse(), (game.getMouse().getMouseY() - edge) / moveDistance, (game.getMouse().getMouseX() - edge) / moveDistance)) { // if there is a piece selected then wait until the player click on a valid position
+				BoardMovements.movePiece(BoardMovements.selectedPiece, board, pieceBox, actualTurn,
+										(game.getMouse().getMouseY() - edge) / moveDistance, (game.getMouse().getMouseX() - edge) / moveDistance);
 				if(!(promoteMenu = BoardMovements.promotePawn(BoardMovements.selectedPiece))) { // if promote not true than chance turn
 					ColorInfo enemyTurn = (actualTurn == ColorInfo.WHITE) ? ColorInfo.BLACK : ColorInfo.WHITE;
 					if(BoardMovements.isCheckmate(board, enemyTurn, pieceBox)) {
@@ -167,7 +170,7 @@ public class GameState extends State {
 			renderHighlightPath(graph);
 		}
 		renderPieces(graph); // Draw all the pieces
-
+		
 		if(promoteMenu) {
 			renderPromoteChoices(graph);
 		}
@@ -184,8 +187,8 @@ public class GameState extends State {
 	private void renderPromoteChoices(Graphics graph) {
 		/*Show on the screen the promote pieces*/
 		int i  = 1;
+		graph.drawImage(promoteBackground, 0, 0, game.getWidth(), game.getHeight(), null); //Draw the background
 		for(Rectangle position : promotionChoices) {
-			graph.drawImage(promoteSquare, (int)position.getX(), (int)position.getY(), (int)position.getWidth(), (int)position.getHeight(), null);				
 			graph.drawImage(renderPieceBox[actualTurn.value][i], (int)position.getX(), (int)position.getY(), (int)position.getWidth(), (int)position.getHeight(), null);
 			i++;
 		}
@@ -211,6 +214,12 @@ public class GameState extends State {
 		//For every valid attack position draw a red square on the position
 		for (Coordinates valid : BoardMovements.validAttack) {
 			graph.drawImage(attackSquare, board[valid.getRow()][valid.getColumn()].getRenderSquare().x,
+							board[valid.getRow()][valid.getColumn()].getRenderSquare().y, squareSize, squareSize, null);
+		}
+		
+		for(Coordinates valid : BoardMovements.specialMoves)
+		{
+			graph.drawImage(specialSquare, board[valid.getRow()][valid.getColumn()].getRenderSquare().x,
 							board[valid.getRow()][valid.getColumn()].getRenderSquare().y, squareSize, squareSize, null);
 		}
 	}
@@ -264,12 +273,11 @@ public class GameState extends State {
 	}
 
 	private void initPromotion() {
-		int step = game.getWidth()/4;
-		promoteSquare = ImageLoader.loadImage("/background/yellow_square.png");
+		int step = (int)(145 * game.getScale());
 		promotionChoices = new ArrayList<>();
-		
-		for(int i = step - (int)(190 * game.getScale()) ; i < game.getWidth() ; i += step) {
-			promotionChoices.add(new Rectangle(i, (int)(game.getHeight()/2) - (squareSize/2), squareSize, squareSize));
+		promoteBackground = ImageLoader.loadImage("/background/promote.png");
+		for(int i = 0 , initialPosition = 248 ; i < 4 ; i++ , initialPosition += step) {
+			promotionChoices.add(new Rectangle(initialPosition, (int)((game.getHeight()/2) + (game.getScale() * 10)), squareSize, squareSize));
 		}
 	}
 	
@@ -440,10 +448,10 @@ public class GameState extends State {
 		moveSquare = ImageLoader.loadImage("/background/blue_square.png");
 		attackSquare = ImageLoader.loadImage("/background/red_square.png");
 		selectSquare = ImageLoader.loadImage("/background/purple_square.png");
+		specialSquare = ImageLoader.loadImage("/background/yellow_square.png");
 		squareSize = (int) (((float) selectSquare.getWidth() - 2) * game.getScale());
 		moveDistance = (int) ((float) (selectSquare.getWidth() - 2 + blueLineSize) * game.getScale());
 		edge = (int) Math.round((((float) edgeSize * game.getScale())));
-		
 		//Logic part
 		BoardMovements.initializePieceMovements(); // Pieces movement rules
 	}

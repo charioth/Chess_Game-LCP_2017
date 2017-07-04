@@ -9,7 +9,6 @@ import input.MouseManager;
 import states.GameState;
 import states.MenuState;
 import states.State;
-import tempassets.Assets;
 
 public class Game implements Runnable {
 	/*Class responsible for starting the game by calling all
@@ -54,8 +53,6 @@ public class Game implements Runnable {
 	}
 
 	private void init() {
-		//Call init methods of every object attribute
-		Assets.init(this);
 		//Create screen
 		display = new Display(name, width, height);
 		//Inputs
