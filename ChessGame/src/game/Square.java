@@ -13,6 +13,7 @@ public class Square {
 		pieceID = -1;
 		color = null;
 	}
+
 	public Square(Square copyThis) {
 		this.renderSquare = copyThis.renderSquare;
 		this.pieceID = copyThis.pieceID;

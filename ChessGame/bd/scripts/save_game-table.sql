@@ -22,14 +22,3 @@ CREATE TABLE piece (
 	constraint c_position unique(game_name, piece_color, piece_index),
 	PRIMARY KEY(id)
 );
-
-INSERT INTO piece (game_name, coord_row, coord_column, piece_type, moved, piece_color, piece_index) VALUES ('teste', 1, 1, 1, false, 1, 1);
-
-INSERT INTO save_game(name, save_date, turn) VALUES ('teste', '10/10/2017', 1);
-
-
-SELECT * FROM piece WHERE game_name = 'teste';
-
-SELECT name FROM save_game;
-
-DELETE FROM piece WHERE game_name = 'TEEESTE';

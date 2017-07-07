@@ -24,7 +24,7 @@ public class Text {
 		graph.setFont(font);
 		graph.drawString(message, x, y);
 	}
-	
+
 	public String getMessage() {
 		return message;
 	}

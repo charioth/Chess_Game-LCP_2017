@@ -9,8 +9,8 @@ import java.util.ArrayList;
 
 public class UIScrollScreen {
 
-	/*ScrollScreen is a class that can receive a image to use as a screen that permits to scroll down and up*/
-	
+	/* ScrollScreen is a class that can receive a image to use as a screen that permits to scroll down and up */
+
 	private ArrayList<UIButton> buttons;
 	private Rectangle screen;
 	private boolean onScreen;
@@ -25,73 +25,78 @@ public class UIScrollScreen {
 	}
 
 	public void tick() {
-		/*Checks what buttons are on the screen, the ones on screen are kept active*/
+		/* Checks what buttons are on the screen, the ones on screen are kept active */
 		for (int i = 0; i < buttons.size(); i++) {
-			if(screen.contains(buttons.get(i).getX(), buttons.get(i).getY()) && (screen.contains(buttons.get(i).getX(), buttons.get(i).getY() + buttons.get(i).getHeight())))
+			if (screen.contains(buttons.get(i).getX(), buttons.get(i).getY())
+					&& (screen.contains(buttons.get(i).getX(), buttons.get(i).getY() + buttons.get(i).getHeight())))
 				buttons.get(i).tick();
 		}
 	}
 
 	public void render(Graphics graph) {
-		/*Checks what buttons are on the screen, the ones on screen are kept active to render*/
-		graph.drawImage(screenImage, (int)screen.getX(), (int)screen.getY(), (int)screen.getWidth(), (int)screen.getHeight(), null);
+		/* Checks what buttons are on the screen, the ones on screen are kept active to render */
+		graph.drawImage(screenImage, (int) screen.getX(), (int) screen.getY(), (int) screen.getWidth(),
+				(int) screen.getHeight(), null);
 		for (int i = 0; i < buttons.size(); i++) {
-			if(screen.contains(buttons.get(i).getX(), buttons.get(i).getY()) && (screen.contains(buttons.get(i).getX(), buttons.get(i).getY() + buttons.get(i).getHeight())))
+			if (screen.contains(buttons.get(i).getX(), buttons.get(i).getY())
+					&& (screen.contains(buttons.get(i).getX(), buttons.get(i).getY() + buttons.get(i).getHeight())))
 				buttons.get(i).render(graph);
 		}
 	}
 
 	public void sMouseMoved(MouseEvent mouse) {
-		/*Checks if the mouse is on the screen, if it is active buttons that are active on the screen to keep track if the mouse is on them*/
-		if (screen.contains(mouse.getX(), mouse.getY()) ) {
+		/* Checks if the mouse is on the screen, if it is active buttons that are active on the screen to keep track if the mouse is on them */
+		if (screen.contains(mouse.getX(), mouse.getY())) {
 			onScreen = true;
 			for (int i = 0; i < buttons.size(); i++) {
-				if(screen.contains(buttons.get(i).getX(), buttons.get(i).getY()) && (screen.contains(buttons.get(i).getX(), buttons.get(i).getY() + buttons.get(i).getHeight())))
-				buttons.get(i).bMouseMoved(mouse);;
+				if (screen.contains(buttons.get(i).getX(), buttons.get(i).getY())
+						&& (screen.contains(buttons.get(i).getX(), buttons.get(i).getY() + buttons.get(i).getHeight())))
+					buttons.get(i).bMouseMoved(mouse);
+				;
 			}
-		}
-		else
-		{
+		} else {
 			onScreen = false;
 		}
 	}
 
 	public void sMouseRelease() {
-		/*Checks what buttons are on the screen, the ones on screen are kept active to respond to mouseRelease events*/
+		/* Checks what buttons are on the screen, the ones on screen are kept active to respond to mouseRelease events */
 		if (onScreen) {
 			onScreen = false;
 			for (int i = 0; i < buttons.size(); i++) {
-				if(screen.contains(buttons.get(i).getX(), buttons.get(i).getY()) && (screen.contains(buttons.get(i).getX(), buttons.get(i).getY() + buttons.get(i).getHeight())))
+				if (screen.contains(buttons.get(i).getX(), buttons.get(i).getY())
+						&& (screen.contains(buttons.get(i).getX(), buttons.get(i).getY() + buttons.get(i).getHeight())))
 					buttons.get(i).bMouseRelease();
 			}
 		}
 	}
 
-
 	public void sMouseScroll(MouseWheelEvent mouse) {
-		/*Respond when mouse scroll is used on the screen*/
+		/* Respond when mouse scroll is used on the screen */
 		int rotation = -mouse.getWheelRotation();
-		
-		if(onScreen)
-		{
-			if(buttons.size() > 0) // If there is at least one button execute
+
+		if (onScreen) {
+			if (buttons.size() > 0) // If there is at least one button execute
 			{
-				//If the dot on the left side below the button is on the screen and the rotation is down, do not let it go down further
-				boolean holdScrollDown = (screen.contains(buttons.get(buttons.size() - 1).getX(), buttons.get(buttons.size() - 1).getY() + buttons.get(buttons.size() - 1).getHeight())) && (rotation < 0);
-				//If the dot on the upper right side of the button is on the screen and the rotation is up, do not let it go turther
-				boolean holdScrollUp = (screen.contains(buttons.get(0).getX(), buttons.get(0).getY()) && (rotation > 0));
-				if(holdScrollDown || holdScrollUp)
+				// If the dot on the left side below the button is on the screen and the rotation is down, do not let it go down further
+				boolean holdScrollDown = (screen.contains(buttons.get(buttons.size() - 1).getX(),
+						buttons.get(buttons.size() - 1).getY() + buttons.get(buttons.size() - 1).getHeight()))
+						&& (rotation < 0);
+				// If the dot on the upper right side of the button is on the screen and the rotation is up, do not let it go turther
+				boolean holdScrollUp = (screen.contains(buttons.get(0).getX(), buttons.get(0).getY())
+						&& (rotation > 0));
+				if (holdScrollDown || holdScrollUp)
 					return;
 			}
-			for (int i = 0; i < buttons.size(); i++) { //Actualize all buttons y position
+			for (int i = 0; i < buttons.size(); i++) { // Actualize all buttons y position
 				buttons.get(i).setY(buttons.get(i).getY() + (rotation * speed));
 				buttons.get(i).getText()[0].setY(buttons.get(i).getText()[0].getY() + (rotation * speed));
 				buttons.get(i).getText()[1].setY(buttons.get(i).getText()[1].getY() + (rotation * speed));
 				buttons.get(i).getBound().setLocation(buttons.get(i).getX(), buttons.get(i).getY());
-			}			
+			}
 		}
 	}
-	
+
 	public ArrayList<UIButton> getButtons() {
 		return buttons;
 	}
@@ -131,7 +136,5 @@ public class UIScrollScreen {
 	public void setScreenImage(BufferedImage screenImage) {
 		this.screenImage = screenImage;
 	}
-	
-	
 
 }

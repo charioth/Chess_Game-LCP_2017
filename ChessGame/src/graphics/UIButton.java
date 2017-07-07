@@ -8,12 +8,10 @@ import java.awt.image.BufferedImage;
 import states.State;
 
 public class UIButton {
-	/*Button class it has a position on the screen, a size (width and height)
-	 * a onButton attribute to control when the mouse is on the button
-	 * a bufferedImage vector to hold the 2 images of the button
-	 * a Rectangle to test if the mouse position is on bound with the button area
-	 * a vector Text if the button uses dynamic messages
-	 * and last the buttonAction that tell what the button should execute when clicked*/
+	/*
+	 * Button class it has a position on the screen, a size (width and height) a onButton attribute to control when the mouse is on the button a bufferedImage vector to hold the 2 images of the button a Rectangle to test if the mouse position is on bound with the button area a vector Text if the
+	 * button uses dynamic messages and last the buttonAction that tell what the button should execute when clicked
+	 */
 	private int index;
 	private int x, y, width, height;
 	private boolean onButton;
@@ -21,8 +19,8 @@ public class UIButton {
 	private Rectangle bound;
 	private ButtonAction click;
 	private Text text[];
-	
-	//Constructor that does not use Text
+
+	// Constructor that does not use Text
 	public UIButton(int x, int y, int width, int height, BufferedImage button[], int index, ButtonAction click) {
 		this.x = x;
 		this.y = y;
@@ -35,9 +33,10 @@ public class UIButton {
 		this.text = null;
 		this.index = index;
 	}
-	
-	//Constructor that use one Text
-	public UIButton(int x, int y, int width, int height, BufferedImage button[], int index, Text text, ButtonAction click) {
+
+	// Constructor that use one Text
+	public UIButton(int x, int y, int width, int height, BufferedImage button[], int index, Text text,
+			ButtonAction click) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -51,9 +50,10 @@ public class UIButton {
 		this.text[1] = text;
 		this.index = index;
 	}
-	
-	//Constructor that use two Texts
-	public UIButton(int x, int y, int width, int height, BufferedImage button[], int index, Text text[], ButtonAction click) {
+
+	// Constructor that use two Texts
+	public UIButton(int x, int y, int width, int height, BufferedImage button[], int index, Text text[],
+			ButtonAction click) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -67,24 +67,27 @@ public class UIButton {
 	}
 
 	public void render(Graphics graph) {
-		/*Method responsible to render the button on the screen*/
-		
-		/*If onButton false it means that the mouse is not on the button so use the first image
-		 * if is true than render the second image*/
+		/* Method responsible to render the button on the screen */
+
+		/*
+		 * If onButton false it means that the mouse is not on the button so use the first image if is true than render the second image
+		 */
 		if (onButton == false) {
 			graph.drawImage(button[0], x, y, width, height, null);
-			if(text != null) text[0].render(graph);
+			if (text != null)
+				text[0].render(graph);
 		} else {
 			graph.drawImage(button[1], x, y, width, height, null);
-			if(text != null) text[1].render(graph);
+			if (text != null)
+				text[1].render(graph);
 		}
 
 	}
 
 	public void bMouseMoved(MouseEvent mouse) {
-		/*Method responsible for checking if the mouse coordinates is in bounds with
-		 * the button area, if true, than onButton should be true to render the second image
-		 * if not then on button is false*/
+		/*
+		 * Method responsible for checking if the mouse coordinates is in bounds with the button area, if true, than onButton should be true to render the second image if not then on button is false
+		 */
 		if (bound.contains(mouse.getX(), mouse.getY())) {
 			onButton = true;
 		} else {
@@ -93,17 +96,16 @@ public class UIButton {
 	}
 
 	public void bMouseRelease() {
-		//If the mouse is on button than call the action method that execute the action
+		// If the mouse is on button than call the action method that execute the action
 		if (onButton) {
-			if(index >= 0)
-			{
+			if (index >= 0) {
 				State.lastButtonIndex = index;
 			}
 			onButton = false;
 			click.action();
 		}
 	}
-	
+
 	public int getX() {
 		return x;
 	}
@@ -136,17 +138,15 @@ public class UIButton {
 		this.height = height;
 	}
 
-	public Text[] getText()
-	{
+	public Text[] getText() {
 		return text;
 	}
-	
-	public void setText(Text text[])
-	{
+
+	public void setText(Text text[]) {
 		this.text = text;
 	}
-	
-	//If there was a action that the button should execute it would be necessary to program here
+
+	// If there was a action that the button should execute it would be necessary to program here
 	public void tick() {
 
 	}

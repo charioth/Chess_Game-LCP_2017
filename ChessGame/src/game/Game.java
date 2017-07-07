@@ -11,8 +11,9 @@ import states.MenuState;
 import states.State;
 
 public class Game implements Runnable {
-	/*Class responsible for starting the game by calling all
-	 * Main classes as attributes and main methods of tick (), render () and run*/
+	/*
+	 * Class responsible for starting the game by calling all Main classes as attributes and main methods of tick (), render () and run
+	 */
 
 	// Screen Attributes
 	private String name;
@@ -38,12 +39,12 @@ public class Game implements Runnable {
 
 	// Thread
 	private Thread thread;
-	
+
 	// Stop condition
 	private boolean running;
 
 	public Game(String name, float scale) {
-	//Constructor of game class, initialize width, height and name to set screen 
+		// Constructor of game class, initialize width, height and name to set screen
 		if (scale <= 0)
 			System.exit(0);
 		this.name = name;
@@ -53,16 +54,16 @@ public class Game implements Runnable {
 	}
 
 	private void init() {
-		//Create screen
+		// Create screen
 		display = new Display(name, width, height);
-		//Inputs
+		// Inputs
 		keyboard = new KeyManager();
 		mouse = new MouseManager();
-		//States
+		// States
 		gameState = new GameState(this);
 		menuState = new MenuState(this);
-		
-		//For the input to work the screen must know that it should respond, so add mouse and keyboard to the Frame and Canvas
+
+		// For the input to work the screen must know that it should respond, so add mouse and keyboard to the Frame and Canvas
 		display.getFrame().addMouseListener(mouse);
 		display.getFrame().addMouseMotionListener(mouse);
 		display.getFrame().addMouseWheelListener(mouse);
@@ -70,27 +71,29 @@ public class Game implements Runnable {
 		display.getCanvas().addMouseListener(mouse);
 		display.getCanvas().addMouseMotionListener(mouse);
 		display.getCanvas().addMouseWheelListener(mouse);
-		//Set initial state (initial screen) in this case menu state
+		// Set initial state (initial screen) in this case menu state
 		State.setCurrentState(menuState);
 	}
 
 	private void tick() {
-		/* Tick method is called 60 times per second by the run method. 
-		 * It call the method of the current state selected*/
-		
-		//Tick to see if any key was pressed
+		/*
+		 * Tick method is called 60 times per second by the run method. It call the method of the current state selected
+		 */
+
+		// Tick to see if any key was pressed
 		keyboard.tick();
-		//Call current state tick method
+		// Call current state tick method
 		if (State.getCurrentState() != null) {
 			State.getCurrentState().tick();
 		}
 	}
 
 	private void render() {
-		/*Method responsible for controlling the canvas doble buffer control
-		 * It creates the buffer if it was not already created clean the screen and draw*/
-		
-		//if there is not a buffer to swap when drawing, then create a buffer
+		/*
+		 * Method responsible for controlling the canvas doble buffer control It creates the buffer if it was not already created clean the screen and draw
+		 */
+
+		// if there is not a buffer to swap when drawing, then create a buffer
 		if (bs == null) {
 			display.getCanvas().createBufferStrategy(3);
 		}
@@ -98,10 +101,10 @@ public class Game implements Runnable {
 		bs = display.getCanvas().getBufferStrategy();
 		// Pass the screen to draw to the graph attribute
 		graph = bs.getDrawGraphics();
-		//Clean screen
+		// Clean screen
 		graph.clearRect(0, 0, width, height);
 
-		//Call render method of the current state
+		// Call render method of the current state
 		if (State.getCurrentState() != null) {
 			State.getCurrentState().render(graph);
 		}
@@ -112,14 +115,14 @@ public class Game implements Runnable {
 
 	@Override
 	public void run() {
-		/*Run has the main loop of the game
-		 * if executes the tick and render of the game 
-		 * 60 times per second */
-		
-		//Delta has the somatory of the difference between the last tick and the actual tick
+		/*
+		 * Run has the main loop of the game if executes the tick and render of the game 60 times per second
+		 */
+
+		// Delta has the somatory of the difference between the last tick and the actual tick
 		double delta = 0.0;
-		long now; //Actual time
-		long lastTime = System.nanoTime(); //Last time
+		long now; // Actual time
+		long lastTime = System.nanoTime(); // Last time
 
 		init();
 
@@ -127,8 +130,8 @@ public class Game implements Runnable {
 			now = System.nanoTime();
 			delta += (double) (now - lastTime) / timerPerTick;
 			lastTime = now;
-			
-			//When delta becomes bigger than one, it means that 1 frame is ready to draw
+
+			// When delta becomes bigger than one, it means that 1 frame is ready to draw
 			if (delta >= 1) {
 				delta--;
 				this.tick();
@@ -138,7 +141,7 @@ public class Game implements Runnable {
 	}
 
 	public synchronized void start() {
-		//Method used to start the thread and initialize the running program
+		// Method used to start the thread and initialize the running program
 		if (running == true)
 			return;
 		running = true;
@@ -147,7 +150,7 @@ public class Game implements Runnable {
 	}
 
 	public synchronized void stop() {
-		//Stop the program, it executes when close the program
+		// Stop the program, it executes when close the program
 		if (running == false)
 			return;
 		display.closeDisplay();
@@ -178,7 +181,7 @@ public class Game implements Runnable {
 	public void setRunning(boolean exit) {
 		running = exit;
 	}
-	
+
 	public int getWidth() {
 		return width;
 	}

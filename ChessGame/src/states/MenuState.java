@@ -56,22 +56,6 @@ public class MenuState extends State {
 			return null;
 	}
 
-	private void simulateLoad()
-	{
-		/**/
-		savedGames.add("SaveGame20:30:40 01/07/17");
-		savedGames.add("SaveGame20:30:40 01/07/17");
-		savedGames.add("SaveGame20:30:40 01/07/17");
-		savedGames.add("SaveGame20:30:40 01/07/17");
-		savedGames.add("SaveGame20:30:40 01/07/17");
-		savedGames.add("SaveGame20:30:40 01/07/17");
-		savedGames.add("SaveGame20:30:40 01/07/17");
-		savedGames.add("SaveGame20:30:40 01/07/17");
-		savedGames.add("SaveGame20:30:40 01/07/17");
-		savedGames.add("SaveGame20:30:40 01/07/17");
-		savedGames.add("SaveGame20:30:40 01/07/17");
-	}
-	
 	@Override
 	public void tick() {
 		// If ESC is clicked on the menu screen then the game closes
@@ -85,17 +69,13 @@ public class MenuState extends State {
 			
 			if (loadScreenMenu) { //Release loadScreen memory
 				loadScreenMenu = false;
-				//System.out.println("MenuState: loadMenu free");
 				loadScreen.getButtons().clear();
 				loadScreen = null;
-				//System.out.println("MenuState: subMenuBackground free");
 				subMenuBackground = null;
 			} else if(gameSelected) { //Release memory of the screen after choose a saved game
-			//	System.out.println("MenuState: gameSelectedMenu free");
 				gameSelected = false;
 				loadSubMenu.getButtons().clear();
 				loadSubMenu = null;
-				//System.out.println("MenuState: gameSelectedBackground free");
 				gameSelectedBackground = null;
 			} else { // If esc was clicked on menu then close game
 				game.stop();
@@ -105,10 +85,8 @@ public class MenuState extends State {
 		
 		if(State.loadGame || State.newGame) // If load or new game true then it will change to gameState so release menu memory and changes state
 		{
-			//System.out.println("MenuState: menu free");
 			menuButtons.getButtons().clear();
 			menuButtons = null;
-			//System.out.println("MenuState: menuBackground free");
 			menuBackground = null;
 			State.setCurrentState(game.getGameState());
 		}	
@@ -137,7 +115,6 @@ public class MenuState extends State {
 	private void initMenuScreen()
 	{
 		/*Initialize the screen and buttons of the first menu screen*/
-		//System.out.println("MenuState: menuBackground load");
 		menuBackground = ImageLoader.loadImage("/background/menu_backgroud.png");
 		try {
 			initMenuButtons();
@@ -149,7 +126,6 @@ public class MenuState extends State {
 	private void initLoadScreen()
 	{
 		/*Initialize the screen and buttons of the second menu screen (list of saved games)*/
-		//System.out.println("MenuState: subMenuBackground load");
 		subMenuBackground = ImageLoader.loadImage("/background/submenu_background.png");
 		initLoadScreenButtons();
 	}
@@ -157,7 +133,6 @@ public class MenuState extends State {
 	private void initGameSelectedScreen()
 	{
 		/*Initialize the screen and  of the third menu screen (game selected)*/
-		//System.out.println("MenuState: gameSelectedBackground load");
 		gameSelectedBackground = ImageLoader.loadImage("/background/load_submenu_background.png");
 		initGameSelectedButtons();
 	}
@@ -165,7 +140,6 @@ public class MenuState extends State {
 	private void initGameSelectedButtons()
 	{
 		/*Init buttons of the selected game load, delete and cancel*/
-		//System.out.println("MenuState: gameSelectedButtons load");
 		BufferedImage loadSaveButton[] = new BufferedImage[2];
 		BufferedImage deleteSaveButton[] = new BufferedImage[2];
 		BufferedImage cancelButton[] = new BufferedImage[2];
@@ -196,7 +170,7 @@ public class MenuState extends State {
 					@Override
 					public void action() {
 						try {
-							DeleteGame.Delete(State.savedGames.get(lastButtonIndex)); //Get the name of the button pressed and removes from database
+							DeleteGame.Delete(State.savedGames.get(lastButtonIndex).split(" ")[0]); //Get the name of the button pressed and removes from database
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -223,7 +197,6 @@ public class MenuState extends State {
 	
 	private void initLoadScreenButtons() {
 		/*Initialize all load screen buttons*/
-		//System.out.println("MenuState: loadScreenButtons load");
 		BufferedImage loadScreenImage = ImageLoader.loadImage("/background/scrollScreen.png");
 		BufferedImage loadButton[] = new BufferedImage[2];
 		int scrollSpeed = 10;
@@ -261,7 +234,6 @@ public class MenuState extends State {
 	}
 
 	private void initMenuButtons() throws Exception{
-		//System.out.println("MenuState: menuButtons load");
 		// Resize the button depending of the scale attribute of the game class
 		BufferedImage[] buttonNewGame = new BufferedImage[2];
 		BufferedImage[] buttonLoadGame = new BufferedImage[2];
